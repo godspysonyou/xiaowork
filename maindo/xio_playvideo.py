@@ -12,6 +12,7 @@ class Timer(QtCore.QThread):
     在多个线程中使用可能会出现问题，因此Qt不建议主界面线程外的线程使用图形类和调用图形类接口。
     否则有可能报错
     '''
+
     def __init__(self, signal='updateTime()', sleep_time=0.04):
         super(Timer, self).__init__()
         self.signal = signal
@@ -20,12 +21,13 @@ class Timer(QtCore.QThread):
     def run(self):
         while True:
             self.emit(QtCore.SIGNAL(self.signal))
-            time.sleep(self.sleep_time) # 休眠固定时间
+            time.sleep(self.sleep_time)  # 休眠固定时间
 
 
 class XioPlayVideo(QtGui.QWidget):
     '''这个类为主程序类
     '''
+
     def __init__(self):
         super(XioPlayVideo, self).__init__()
         self.ui = ui.Ui_Form()
@@ -33,18 +35,18 @@ class XioPlayVideo(QtGui.QWidget):
         self.left_cam = cv2.VideoCapture('./videos/left_cam.mp4')  # 左摄像头
         self.right_cam = cv2.VideoCapture('./videos/right_cam.mp4')
 
-        self.thread_video_receive = threading.Thread(target=self.video_receive_local) # 该线程用来读取视频流
+        self.thread_video_receive = threading.Thread(target=self.video_receive_local)  # 该线程用来读取视频流
         self.thread_video_receive.start()
-        self.thread_time = Timer('updatePlay()') # 该线程用来每隔0.04秒在label上绘图
+        self.thread_time = Timer('updatePlay()')  # 该线程用来每隔0.04秒在label上绘图
         self.connect(self.thread_time, QtCore.SIGNAL('updatePlay()'), self.video_play)
         self.thread_time.start()
-        self.thread_recog = Timer('updatePlay()', sleep_time=1) # 该线程用来每隔一秒分析图像
+        self.thread_recog = Timer('updatePlay()', sleep_time=1)  # 该线程用来每隔一秒分析图像
         self.connect(self.thread_recog, QtCore.SIGNAL('updatePlay()'), self.video_recog)
         self.thread_recog.start()
-        self.thread_data = Timer('updatePlay()', sleep_time=1800) # 该线程用来每隔半小时向数据库读取数据
+        self.thread_data = Timer('updatePlay()', sleep_time=1800)  # 该线程用来每隔半小时向数据库读取数据
         self.connect(self.thread_data, QtCore.SIGNAL('updatePlay()'), self.data_read)
         self.thread_data.start()
-
+        self.thread_tcp = None # 该线程用来完成tcp，未写完
 
     def video_receive_local(self, cam1='./videos/left_cam.mp4', cam2='./videos/right_cam.mp4', time_flag=True):
         '''该方法用来接收本地视频
@@ -83,15 +85,16 @@ class XioPlayVideo(QtGui.QWidget):
         '''该方法用来播放视频
         :return: None
         '''
-        def label_show_left(frame, label=self.ui.label): # 左控件label播放
+
+        def label_show_left(frame, label=self.ui.label):  # 左控件label播放
             height, width, _ = frame.shape
             frame_change = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             frame_resize = cv2.resize(frame_change, (500, 300), interpolation=cv2.INTER_AREA)
             image = QtGui.QImage(frame_resize.data, frame_resize.shape[1], frame_resize.shape[0],
-                                 QtGui.QImage.Format_RGB888) # 处理成QImage
+                                 QtGui.QImage.Format_RGB888)  # 处理成QImage
             label.setPixmap(QtGui.QPixmap.fromImage(image))
 
-        def label_show_right(frame, label=self.ui.label_2): # 右空间Lable播放
+        def label_show_right(frame, label=self.ui.label_2):  # 右空间Lable播放
             label_show_left(frame, label)
 
         if self.frame_left is not None:
@@ -104,8 +107,6 @@ class XioPlayVideo(QtGui.QWidget):
 
     def data_read(self):
         pass
-
-
 
 
 if __name__ == '__main__':

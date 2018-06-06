@@ -20,7 +20,7 @@ class DataAccess():
         try:
             self.open_conn()
             self.cursor.execute(sql)
-            results = self.cursor.fetchone()
+            results = self.cursor.fetchall()
             return results
         except Exception as e:
             raise e
@@ -43,7 +43,7 @@ class DataAccess():
         # import functools
         # s = functools.partial(self.select, sql='SELECT VERSION()')
         # return s()[0]
-        return self.select(sql='SELECT VERSION()')[0]
+        return self.select(sql='SELECT VERSION()')[0][0]
 
 
 if __name__ == "__main__":
