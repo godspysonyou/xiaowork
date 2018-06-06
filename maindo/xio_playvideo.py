@@ -35,6 +35,8 @@ class XioPlayVideo(QtGui.QWidget):
         self.thread_time = Timer('updatePlay()')
         self.connect(self.thread_time, QtCore.SIGNAL('updatePlay()'), self.video_play)
         self.thread_time.start()
+        self.thread_recog = Timer('updatePlay()', sleep_time=1)
+        self.connect(self.thread_recog, QtCore.SIGNAL('updatePlay()'), self.video_recog)
 
     def video_receive_local(self, cam1='./videos/left_cam.mp4', cam2='./videos/right_cam.mp4', time_flag=True):
         if self.left_cam.isOpened() is False:
@@ -67,27 +69,18 @@ class XioPlayVideo(QtGui.QWidget):
                                  QtGui.QImage.Format_RGB888)
             label.setPixmap(QtGui.QPixmap.fromImage(image))
 
-        def label_show_right(frame ,label=self.ui.label_2):
-            label_show_left(frame,label)
+        def label_show_right(frame, label=self.ui.label_2):
+            label_show_left(frame, label)
 
         if self.frame_left is not None:
             label_show_left(self.frame_left)
         if self.frame_right is not None:
             label_show_right(self.frame_right)
 
-    def monitoring(self):
-        def label_show(frame):
-            height, width, _ = frame.shape
-            frame_change = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            frame_resize = cv2.resize(frame_change, (400, 300), interpolation=cv2.INTER_AREA)
-            image = QtGui.QImage(frame_resize.data, frame_resize.shape[1], frame_resize.shape[0],
-                                 QtGui.QImage.Format_RGB888)
-            self.ui.label.setPixmap(QtGui.QPixmap.fromImage(image))
+    def video_recog(self):
+        pass
 
-        ret_1, frame_1 = self.left_cam.read()
-        while ret_1:
-            label_show(frame_1)
-            ret_1, frame_1 = self.left_cam.read()
+
 
 
 if __name__ == '__main__':
