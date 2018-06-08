@@ -1,27 +1,12 @@
 from PyQt4 import QtGui, QtCore
+from PyQt4.QtNetwork import *
 import uifiles.xio_playvideo_ui as ui
 import sys
 import cv2
 import threading
 import time
+from utils.utils import Timer
 
-
-class Timer(QtCore.QThread):
-    '''这个类用来向主线程发射信号，通知其每隔一段时间运行一个槽函数
-    Qt只允许主线程（也就是main函数在的那个线程）使用界面类，因为界面类不是线程安全的，不可重入，
-    在多个线程中使用可能会出现问题，因此Qt不建议主界面线程外的线程使用图形类和调用图形类接口。
-    否则有可能报错
-    '''
-
-    def __init__(self, signal='updateTime()', sleep_time=0.04):
-        super(Timer, self).__init__()
-        self.signal = signal
-        self.sleep_time = sleep_time
-
-    def run(self):
-        while True:
-            self.emit(QtCore.SIGNAL(self.signal))
-            time.sleep(self.sleep_time)  # 休眠固定时间
 
 
 class XioPlayVideo(QtGui.QWidget):
@@ -34,6 +19,14 @@ class XioPlayVideo(QtGui.QWidget):
         self.ui.setupUi(self)
         self.left_cam = cv2.VideoCapture('./videos/left_cam.mp4')  # 左摄像头
         self.right_cam = cv2.VideoCapture('./videos/right_cam.mp4')
+        self.frame_left = None
+        self.frame_right = None
+
+        self.tcpServer = QTcpServer()  # tcp 服务器端
+        if not self.tcpServer.listen(QHostAddress.LocalHost, 8888):
+            print(self.tcpServer.errorString())
+            self.close()
+        self.connect(self.tcpServer, QtCore.SIGNAL('newConnection()'), self.read_message)
 
         self.thread_video_receive = threading.Thread(target=self.video_receive_local)  # 该线程用来读取视频流
         self.thread_video_receive.start()
@@ -46,7 +39,23 @@ class XioPlayVideo(QtGui.QWidget):
         self.thread_data = Timer('updatePlay()', sleep_time=1800)  # 该线程用来每隔半小时向数据库读取数据
         self.connect(self.thread_data, QtCore.SIGNAL('updatePlay()'), self.data_read)
         self.thread_data.start()
-        self.thread_tcp = None # 该线程用来完成tcp，未写完
+        self.thread_tcp = None  # 该线程用来完成tcp，未写完
+
+    def read_message(self):
+        print('服务')
+        # size_int32 = 4
+        # in_data = QtCore.QDataStream()
+        # in_data.setVersion(QtCore.QDataStream.Qt_4_6)
+        #
+        # # if self.blockSize == 0:
+        # #     if self.tcpSocket.bytesAvailable() < size_int32:
+        # #         return
+        # #     self.blockSize = in_data.readUInt32()
+        # #
+        # # if self.tcpSocket.bytesAvailable() < self.blockSize:
+        # #     return
+        # self.message = in_data.readString()
+        # print(self.message)
 
     def video_receive_local(self, cam1='./videos/left_cam.mp4', cam2='./videos/right_cam.mp4', time_flag=True):
         '''该方法用来接收本地视频
