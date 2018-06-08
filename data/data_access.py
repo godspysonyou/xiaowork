@@ -46,6 +46,8 @@ class DataAccess():
         return self.select(sql='SELECT VERSION()')[0][0]
 
 
+
+
 if __name__ == "__main__":
     da = DataAccess()
     print(da.select_version())

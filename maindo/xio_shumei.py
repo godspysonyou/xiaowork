@@ -25,7 +25,7 @@ class XioShuMei(QtGui.QWidget):
 
 
     def keyPressEvent(self, QKeyEvent):
-        if QKeyEvent.key() == QtCore.Qt.Key_1:
+        if QKeyEvent.key() == QtCore.Qt.Key_1: # 这里要设计逻辑避免工人误按
             client_connect(self.HOST, self.PORT, '1')
 
         elif QKeyEvent.key() == QtCore.Qt.Key_2:

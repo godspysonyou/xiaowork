@@ -1,5 +1,8 @@
 from PyQt4 import QtCore
 import time
+import matplotlib.pyplot as plt
+import cv2
+import numpy as np
 
 
 class Timer(QtCore.QThread):
@@ -18,3 +21,43 @@ class Timer(QtCore.QThread):
         while True:
             self.emit(QtCore.SIGNAL(self.signal))
             time.sleep(self.sleep_time)  # 休眠固定时间
+
+
+def show_image(image):
+    '''
+    显示图像的像素坐标，便于截取兴趣区域
+    :param image:
+    :return:
+    '''
+    i = plt.imread(image)
+    plt.imshow(i)
+    plt.show()
+
+
+def roi_cut(filepath='../images/50.jpg', loc=(5, 130, 980, 1090)):
+    '''
+    cut roi in a image
+    :param filepath:
+    :param loc:
+    :return:
+    '''
+    image = cv2.imread(filepath, 1)
+    l = image[loc[0]:loc[1], loc[2]:loc[3]]
+    cv2.imwrite(filepath[0:-4] + '1.jpg', l)
+
+
+if __name__ == '__main__':
+    # show_image('/Users/kaimingcheng/PycharmProjects/xiaowork/maindo/images/447.jpg')
+    img = cv2.imread('/Users/kaimingcheng/PycharmProjects/xiaowork/maindo/images/447.jpg')
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+
+    lower = np.array([-60, 20, 80])
+    upper = np.array([80, 80, 250])
+    mask = cv2.inRange(img, lower, upper)
+
+    res = cv2.bitwise_and(img, img, mask=mask)
+
+    #print(img[250,700])
+
+    cv2.imshow('res', res)
+    cv2.waitKey(0)
