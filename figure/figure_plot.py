@@ -26,9 +26,8 @@ class Figure_MT(Figure_Origin):
 
     def plot(self, *args, **kwargs):
         def plot_mt():
-            plt.rcParams['font.sans-serif'] = ['Microsoft YaHei']  # 用来正常显示中文标签
             ax = self.figure.add_subplot(111)
-            ax.yaxis.grid(True)
+            ax.yaxis.grid(True) # y 方向网格
             n_groups = 3
 
             means_plan = (4, 3, 3)
@@ -38,7 +37,7 @@ class Figure_MT(Figure_Origin):
             index = np.arange(n_groups) + 0.5
             bar_width = 0.2
 
-            opacity = 0.4
+            opacity = 0.4 # 直方图透明度
 
             rects1 = ax.bar(index, means_plan, bar_width,
                             alpha=opacity, color='red',
@@ -58,6 +57,7 @@ class Figure_MT(Figure_Origin):
             self.figure.tight_layout()
             # plt.show()
             self.canvas.draw()
+            plt.close() # 关闭，否则会出现warning
 
         plot_mt()
 
@@ -71,10 +71,8 @@ class Figure_OEE(Figure_Origin):
 
     def plot(self, *args, **kwargs):
         def plot_oee():
-            import matplotlib.pyplot as plt
             import matplotlib as mpl
             import matplotlib.ticker as mtick
-            plt.rcParams['font.sans-serif'] = ['Microsoft YaHei']  # 用来正常显示中文标签
             mpl.rc('ytick', labelsize=10)
             fmt = '%.f%%'
             yticks = mtick.FormatStrFormatter(fmt)
@@ -105,6 +103,7 @@ class Figure_OEE(Figure_Origin):
                 axes.text(a + 0.1, b + 0.01, '%1.f%%' % b, ha='center', va='bottom', color='purple', fontsize=10)  # 25
             axes.yaxis.grid(True)
             self.canvas.draw()
+            plt.close()
         plot_oee()
 
 
@@ -117,7 +116,6 @@ class Figure_Loss(Figure_Origin):
 
     def plot(self, *args, **kwargs):
         def plot_loss():
-            plt.rcParams['font.sans-serif'] = ['Microsoft YaHei']  # 用来正常显示中文标签
             ax = self.figure.add_subplot(111)
             rect = ax.patch
             rect.set_facecolor('lightblue')
@@ -138,6 +136,7 @@ class Figure_Loss(Figure_Origin):
             ax.set_xticklabels((u'拆机', u'调试', u'静止', u'工作'), fontsize=15)
             ax.yaxis.grid(True)
             self.canvas.draw()
+            plt.close()
 
         return plot_loss()
 
@@ -152,7 +151,6 @@ class Figure_Pie(Figure_Origin):
 
     def plot(self, *args, **kwargs):
         def plot_pie():
-            plt.rcParams['font.sans-serif'] = ['Microsoft YaHei']
             ax = self.figure.add_subplot(111)
             ax.set_title("设备工作损失时间占比",fontsize=20)
             labels = 'e1', 'e2', 'e3', 'e4'
@@ -162,6 +160,7 @@ class Figure_Pie(Figure_Origin):
                    startangle=90)
             ax.axis('equal')
             self.canvas.draw()
+            plt.close()
 
         plot_pie()
 
