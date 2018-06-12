@@ -30,7 +30,7 @@ class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     pass
 
 class Server():
-    HOST = '192.168.2.125'
+    HOST = 'localhost'
     PORT = 8081
     def __init__(self):
         #self.server_class = ThreadedTCPRequestHandler
