@@ -22,6 +22,10 @@ class Timer(QtCore.QThread):
             self.emit(QtCore.SIGNAL(self.signal))
             time.sleep(self.sleep_time)  # 休眠固定时间
 
+class Vision:
+    def __init__(self):
+        self.machine_back = cv2.imread()
+
 
 def show_image(image):
     '''

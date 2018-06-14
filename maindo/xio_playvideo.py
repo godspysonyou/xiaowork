@@ -22,12 +22,6 @@ class XioPlayVideo(QtGui.QWidget):
         self.frame_left = None
         self.frame_right = None
 
-        self.tcpServer = QTcpServer()  # tcp 服务器端
-        if not self.tcpServer.listen(QHostAddress.LocalHost, 8888):
-            print(self.tcpServer.errorString())
-            self.close()
-        self.connect(self.tcpServer, QtCore.SIGNAL('newConnection()'), self.read_message)
-
         self.thread_video_receive = threading.Thread(target=self.video_receive_local)  # 该线程用来读取视频流
         self.thread_video_receive.start()
         self.thread_time = Timer('updatePlay()')  # 该线程用来每隔0.04秒在label上绘图
@@ -41,21 +35,6 @@ class XioPlayVideo(QtGui.QWidget):
         self.thread_data.start()
         self.thread_tcp = None  # 该线程用来完成tcp，未写完
 
-    def read_message(self):
-        print('服务')
-        # size_int32 = 4
-        # in_data = QtCore.QDataStream()
-        # in_data.setVersion(QtCore.QDataStream.Qt_4_6)
-        #
-        # # if self.blockSize == 0:
-        # #     if self.tcpSocket.bytesAvailable() < size_int32:
-        # #         return
-        # #     self.blockSize = in_data.readUInt32()
-        # #
-        # # if self.tcpSocket.bytesAvailable() < self.blockSize:
-        # #     return
-        # self.message = in_data.readString()
-        # print(self.message)
 
     def video_receive_local(self, cam1='./videos/left_cam.mp4', cam2='./videos/right_cam.mp4', time_flag=True):
         '''该方法用来接收本地视频
