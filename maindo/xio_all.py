@@ -7,6 +7,7 @@ import time
 from utils.utils import Timer,MyQueue
 from utils.vision import Vision
 import socketserver
+import time
 from figure.figure_plot import *
 
 
@@ -182,7 +183,7 @@ class XioAll(QtGui.QWidget):
             :return:
             '''
             has_spark = False
-            i = 0
+
             if not self.q.is_full(): # 续满,先这样，可能要写入读图像中
                 if self.frame_left is not None:
                     self.q.enqueue(self.frame_left)
@@ -194,13 +195,20 @@ class XioAll(QtGui.QWidget):
 
                 for frame in self.q.queue:
                     #frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                    has_spark = self.vision.find_spark(frame)
+                    if self.vision.find_spark(frame):
+                        has_spark = True
+                        break
                 if has_spark:
                     print('工作')
                 else:
                     print('静止了，往catch文件夹中查看原因')
-                    cv2.imwrite('./catch/'+str(i)+'.jpg',frame)
-                    i+=1
+                    t = time.localtime()
+                    hour = t[3]
+                    mini = t[4]
+                    seco = t[5]
+                    filename = str(hour)+'-'+str(mini)+'-'+str(seco)
+                    cv2.imwrite('./catch/'+filename+'.jpg',frame)
+
 
 
 
@@ -212,6 +220,7 @@ class XioAll(QtGui.QWidget):
 
         def video_recog_right():
             pass
+        video_recog_left()
 
 
     def data_read(self):

@@ -31,8 +31,8 @@ def find_spark_left(img_gam, spark_roi):
     mask = cv2.inRange(hsv, lower, upper)
     # res_1 = cv2.bitwise_and(hsv,hsv,mask=mask) # hsv颜色选取火花颜色
     res = cv2.bitwise_and(mask, mask, mask=spark_roi)  # 在该区域检索
-    res /= 255
-    s = np.sum(res)
+    num_res = res/255
+    s = np.sum(num_res)
     if s > 6000:
         return True
     return False
@@ -103,5 +103,15 @@ class Vision():
         if mf_flag is True:
             print('机器处于前向')
         return mb_flag or mf_flag
+
+
+if __name__ == '__main__':
+    v = Vision()
+    cap = cv2.VideoCapture('/Users/kaimingcheng/PycharmProjects/xiaowork/maindo/videos/left_cam.mp4')
+    while (1):
+        # Take each frame
+        _, img = cap.read()
+
+        print(v.find_spark(img))
 
 
