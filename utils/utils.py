@@ -22,9 +22,34 @@ class Timer(QtCore.QThread):
             self.emit(QtCore.SIGNAL(self.signal))
             time.sleep(self.sleep_time)  # 休眠固定时间
 
-class Vision:
+class MyQueue():
+    MAX = 20
     def __init__(self):
-        self.machine_back = cv2.imread()
+        self.queue = []
+
+    def is_full(self):
+        if len(self.queue) == self.MAX:
+            return True
+        elif len(self.queue) > self.MAX:
+            raise Exception('上溢出')
+        return False
+
+    def is_empty(self):
+        if len(self.queue) == 0:
+            return True
+
+    def enqueue(self,frame):
+        if not self.is_full():
+            self.queue.append(frame)
+        else:
+            print('溢出')
+
+    def dequeue(self):
+        if not self.is_empty():
+            self.queue.remove(self.queue[0])
+        else:
+            print('没有了')
+
 
 
 def show_image(image):
@@ -96,7 +121,7 @@ def find_spark_test():
         # Convert BGR to HSV
 
         img_gam = gamma_trans(img, 0.75)
-        img0 = cv2.imread('/Users/kaimingcheng/PycharmProjects/xiaowork/maindo/images/mask.jpg', 0)
+        img0 = cv2.imread('/Users/kaimingcheng/PycharmProjects/xiaowork/maindo/images/mask_1.jpg', 0)
         ret, thresh1 = cv2.threshold(img0, 127, 255, cv2.THRESH_BINARY)
         hsv = cv2.cvtColor(img_gam, cv2.COLOR_BGR2HSV)
 
@@ -148,7 +173,21 @@ def test1():
 
 if __name__ == '__main__':
     # test1()
-    find_spark_test()
-    # s = np.array([[1,0],
-    #          [1,1]])
-    # print(np.sum(s))
+    #find_spark_test()
+    #show_image('./images/1.jpg')
+    #roi_cut('./images/1.jpg', (180,420,600,810))
+    mq = MyQueue()
+    mq.enqueue(1)
+    mq.enqueue(5)
+    mq.enqueue(1)
+    mq.enqueue(5)
+    mq.enqueue(1)
+    mq.enqueue(5)
+    mq.enqueue(1)
+    mq.enqueue(5)
+    mq.enqueue(1)
+    mq.enqueue(5)
+    mq.enqueue(1)
+    mq.enqueue(5)
+    mq.dequeue()
+    print(mq.queue)

@@ -4,7 +4,8 @@ import sys
 import cv2
 import threading
 import time
-from utils.utils import Timer
+from utils.utils import Timer,MyQueue
+from utils.vision import Vision
 import socketserver
 from figure.figure_plot import *
 
@@ -50,25 +51,32 @@ class XioAll(QtGui.QWidget):
         super(XioAll, self).__init__()
         self.ui = ui.Ui_Form()
         self.ui.setupUi(self)
-        self.left_cam = cv2.VideoCapture('./videos/left_cam.mp4')  # 左摄像头
-        self.right_cam = cv2.VideoCapture('./videos/right_cam.mp4')
+
         self.frame_left = None
         self.frame_right = None
+        self.isWork = True
+        self.q = MyQueue() # 存放帧队列
+        self.vision = Vision()
 
-        self.thread_figure = Timer('updatePlay()', sleep_time=2)
+        self.thread_figure = Timer('updatePlay()', sleep_time=2) # 该线程用来每隔2秒刷新绘图区
         self.connect(self.thread_figure, QtCore.SIGNAL('updatePlay()'), self.draw)
         self.thread_figure.start()
-        self.server = ThreadedTCPServer((self.HOST, self.PORT), ThreadedTCPRequestHandler)
+
+        self.server = ThreadedTCPServer((self.HOST, self.PORT), ThreadedTCPRequestHandler) # 该线程用来一直监听客户端的请求
         self.server_thread = threading.Thread(target=self.server.serve_forever)
         self.server_thread.start()
+
         self.thread_video_receive = threading.Thread(target=self.video_receive_local)  # 该线程用来读取视频流
         self.thread_video_receive.start()
+
         self.thread_time = Timer('updatePlay()')  # 该线程用来每隔0.04秒在label上绘图
         self.connect(self.thread_time, QtCore.SIGNAL('updatePlay()'), self.video_play)
         self.thread_time.start()
+
         self.thread_recog = Timer('updatePlay()', sleep_time=1)  # 该线程用来每隔一秒分析图像
         self.connect(self.thread_recog, QtCore.SIGNAL('updatePlay()'), self.video_recog)
         self.thread_recog.start()
+
         self.thread_data = Timer('updatePlay()', sleep_time=1800)  # 该线程用来每隔半小时向数据库读取数据
         self.connect(self.thread_data, QtCore.SIGNAL('updatePlay()'), self.data_read)
         self.thread_data.start()
@@ -80,10 +88,8 @@ class XioAll(QtGui.QWidget):
         :param time_flag: 是否休眠，本地视频为True
         :return: None
         '''
-        if self.left_cam.isOpened() is False:
-            self.left_cam = cv2.VideoCapture(cam1)
-        if self.right_cam.isOpened() is False:
-            self.right_cam = cv2.VideoCapture(cam2)
+        self.left_cam = cv2.VideoCapture(cam1)
+        self.right_cam = cv2.VideoCapture(cam2)
         ret_1, frame_1 = self.left_cam.read()
         ret_2, frame_2 = self.right_cam.read()
         while True:
@@ -128,6 +134,10 @@ class XioAll(QtGui.QWidget):
             label_show_right(self.frame_right)
 
     def draw(self):
+        '''
+        展示图标
+        :return:
+        '''
         def draw_fp():  # 绘制损失饼图
             fp = Figure_Pie()
             fp.plot(*(1, 1, 1, 1))  # '*'有一个解包的功能，将（1，1，1，1）解包为 1 1 1 1
@@ -166,7 +176,43 @@ class XioAll(QtGui.QWidget):
         draw_oee()
 
     def video_recog(self):
-        pass
+        def video_recog_left():
+            '''
+            做摄像头识别
+            :return:
+            '''
+            has_spark = False
+            i = 0
+            if not self.q.is_full(): # 续满,先这样，可能要写入读图像中
+                if self.frame_left is not None:
+                    self.q.enqueue(self.frame_left)
+
+            else:
+                self.q.dequeue()
+                if self.frame_left is not None:
+                    self.q.enqueue(self.frame_left)
+
+                for frame in self.q.queue:
+                    #frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                    has_spark = self.vision.find_spark(frame)
+                if has_spark:
+                    print('工作')
+                else:
+                    print('静止了，往catch文件夹中查看原因')
+                    cv2.imwrite('./catch/'+str(i)+'.jpg',frame)
+                    i+=1
+
+
+
+
+
+
+
+            pass
+
+        def video_recog_right():
+            pass
+
 
     def data_read(self):
         pass
