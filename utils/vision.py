@@ -71,7 +71,7 @@ class Vision():
     def __init__(self):
         self.machine_back = cv2.imread('./images/machine_back.jpg', 0)  # 机器一般静止图，后向
         self.machine_forward = cv2.imread('./images/machine_forward.jpg', 0)
-        self.mb_loc = (80, 470, 250, 590)  # 机器一般静止位置，后向
+        self.mb_loc = (80, 470, 250, 590)  # 机器一般静止位置，后向，这里可以改成切片模式
         self.mf_loc = (180, 420, 600, 810)
 
         self.mask_left = cv2.imread('./images/mask_1.jpg', 0)
