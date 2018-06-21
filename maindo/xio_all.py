@@ -9,6 +9,7 @@ from utils.vision import Vision
 import socketserver
 import time
 from figure.figure_plot import *
+from data import data_access
 
 
 def data_deal(func):  # 要接受参数就要改成三层装饰器
@@ -25,20 +26,34 @@ class ThreadedTCPRequestHandler(socketserver.StreamRequestHandler):
         data = str(self.request.recv(1024), 'utf-8')
         #print(data)
         if data == 'action1':
-            print(1)
+            dz = data # 动作
+            da = data_access.DataAccess()
+            da.insert_action(dz)
         elif data == 'action2':
-            pass
+            dz = data  # 动作
+            da = data_access.DataAccess()
+            da.insert_action(dz)
         elif data == 'action3':
-            pass
+            dz = data  # 动作
+            da = data_access.DataAccess()
+            da.insert_action(dz)
         elif data == 'action4':
-            pass
+            dz = data  # 动作
+            da = data_access.DataAccess()
+            da.insert_action(dz)
         elif data == 'action5':
-            pass
+            dz = data  # 动作
+            da = data_access.DataAccess()
+            da.insert_action(dz)
         elif data == 'action6':
-            pass
+            dz = data  # 动作
+            da = data_access.DataAccess()
+            da.insert_action(dz)
         elif data[0:4] == 'stop':
+            dz = data[4:]
+            da = data_access.DataAccess()
+            da.insert_action(dz,FLAG='end')
 
-            pass
 
 
 class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):

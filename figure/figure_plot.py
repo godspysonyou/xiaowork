@@ -86,7 +86,7 @@ class Figure_OEE(Figure_Origin):
             type1 = axes.plot(X, Y, label="OEE变化对比", c='g', lw=2, marker='s', mec='r', mfc='r', ms='5')
 
             # 加标题
-            axes.set_title("OEE效能能日推图", fontsize=20)
+            axes.set_title("OEE效能日推图", fontsize=20)
 
             axes.set_xticks((range(0, 14)))
             axes.tick_params(axis='both', labelsize=10)

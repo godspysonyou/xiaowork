@@ -1,4 +1,6 @@
 import pymysql
+import time
+import datetime
 
 
 class DataAccess():
@@ -16,7 +18,7 @@ class DataAccess():
                                     charset='utf8')
         self.cursor = self.conn.cursor()
 
-    def select(self, sql):
+    def select_(self, sql):
         try:
             self.open_conn()
             self.cursor.execute(sql)
@@ -28,7 +30,7 @@ class DataAccess():
             self.conn.close()
             self.cursor.close()
 
-    def update(self, sql):
+    def update_(self, sql):
         try:
             self.open_conn()
             self.cursor.execute(sql)
@@ -45,10 +47,72 @@ class DataAccess():
         # return s()[0]
         return self.select(sql='SELECT VERSION()')[0][0]
 
-    def insert_action1(self):
-        sql = 'insert into '
+    def insert_action(self, DZ, FLAG='start'):
+        current_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        sql = 'insert into DZ(SJC,GRGH,LJGH,DZ,FLAG) values("%s","%s","%s","%s","%s")' % (
+        current_time, '1A', '0A', DZ, FLAG)
+        self.update_(sql)
 
 
+# 耗材分时监控表
+class MaterialData(DataAccess):
+    def __init__(self):
+        super(MaterialData, self).__init__()
+
+    def select(self):
+        sql = ''
+        result = self.select_(sql)
+        return result
+
+    def update(self, sql):
+        sql = ''
+        self.update_(sql)
+
+
+# OEE效能日推表
+class OEEData(DataAccess):
+    def __init__(self):
+        super(OEEData, self).__init__()
+
+    def select(self):
+        sql = ''
+        result = self.select_(sql)
+        return result
+
+    def update(self, sql):
+        sql = ''
+        self.update_(sql)
+
+
+
+# 设备工作损失时间统计表
+class EquipmentTimeData(DataAccess):
+    def __init__(self):
+        super(EquipmentTimeData, self).__init__()
+
+    def select(self):
+        sql = ''
+        result = self.select_(sql)
+        return result
+
+    def update(self, sql):
+        sql = ''
+        self.update_(sql)
+
+
+# 设备工作损失时间占比表
+class EquipmentData(DataAccess):
+    def __init__(self):
+        super(EquipmentData, self).__init__()
+
+    def select(self):
+        sql = ''
+        result = self.select_(sql)
+        return result
+
+    def update(self, sql):
+        sql = ''
+        self.update_(sql)
 
 
 if __name__ == "__main__":

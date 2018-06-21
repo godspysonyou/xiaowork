@@ -64,7 +64,10 @@ class XioShuMei(QtGui.QWidget):
         elif QKeyEvent.key() == QtCore.Qt.Key_6:
             key_press_operation('action6')
         elif QKeyEvent.key() == QtCore.Qt.Key_0:
-            key_press_stop()
+            if self.current_event is not None:
+                key_press_stop()
+            else:
+                print('当前没有要停止的')
 
         else:
             print('no key')
