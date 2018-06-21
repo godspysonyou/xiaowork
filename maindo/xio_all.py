@@ -4,7 +4,7 @@ import sys
 import cv2
 import threading
 import time
-from utils.utils import Timer,MyQueue
+from utils.utils import Timer, MyQueue
 from utils.vision import Vision
 import socketserver
 import time
@@ -47,6 +47,7 @@ class XioAll(QtGui.QWidget):
     '''
     HOST = 'localhost'
     PORT = 8081
+    TOTAL = 0
 
     def __init__(self):
         super(XioAll, self).__init__()
@@ -56,14 +57,14 @@ class XioAll(QtGui.QWidget):
         self.frame_left = None
         self.frame_right = None
         self.isWork = True
-        self.q = MyQueue() # 存放帧队列
+        self.q = MyQueue()  # 存放帧队列
         self.vision = Vision()
 
-        self.thread_figure = Timer('updatePlay()', sleep_time=2) # 该线程用来每隔2秒刷新绘图区
+        self.thread_figure = Timer('updatePlay()', sleep_time=120)  # 该线程用来每隔2分钟刷新绘图区
         self.connect(self.thread_figure, QtCore.SIGNAL('updatePlay()'), self.draw)
         self.thread_figure.start()
 
-        self.server = ThreadedTCPServer((self.HOST, self.PORT), ThreadedTCPRequestHandler) # 该线程用来一直监听客户端的请求
+        self.server = ThreadedTCPServer((self.HOST, self.PORT), ThreadedTCPRequestHandler)  # 该线程用来一直监听客户端的请求
         self.server_thread = threading.Thread(target=self.server.serve_forever)
         self.server_thread.start()
 
@@ -139,6 +140,7 @@ class XioAll(QtGui.QWidget):
         展示图标
         :return:
         '''
+
         def draw_fp():  # 绘制损失饼图
             fp = Figure_Pie()
             fp.plot(*(1, 1, 1, 1))  # '*'有一个解包的功能，将（1，1，1，1）解包为 1 1 1 1
@@ -177,6 +179,8 @@ class XioAll(QtGui.QWidget):
         draw_oee()
 
     def video_recog(self):
+        self.TOTAL += 1
+
         def video_recog_left():
             '''
             做摄像头识别
@@ -184,7 +188,7 @@ class XioAll(QtGui.QWidget):
             '''
             has_spark = False
 
-            if not self.q.is_full(): # 续满,先这样，可能要写入读图像中
+            if not self.q.is_full():  # 续满,先这样，可能要写入读图像中
                 if self.frame_left is not None:
                     self.q.enqueue(self.frame_left)
 
@@ -194,34 +198,29 @@ class XioAll(QtGui.QWidget):
                     self.q.enqueue(self.frame_left)
 
                 for frame in self.q.queue:
-                    #frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                    # frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                     if self.vision.find_spark(frame):
                         has_spark = True
                         break
                 if has_spark:
-                    print('工作')
+                    # print('工作')
+                    pass
                 else:
                     print('静止了，往catch文件夹中查看原因')
                     t = time.localtime()
                     hour = t[3]
                     mini = t[4]
                     seco = t[5]
-                    filename = str(hour)+'-'+str(mini)+'-'+str(seco)
-                    cv2.imwrite('./catch/'+filename+'.jpg',frame)
-
-
-
-
-
-
-
+                    filename = str(hour) + '-' + str(mini) + '-' + str(seco)
+                    if self.TOTAL % 60 == 0:
+                        cv2.imwrite('./catch/' + filename + '.jpg', frame)
 
             pass
 
         def video_recog_right():
             pass
-        video_recog_left()
 
+        video_recog_left()
 
     def data_read(self):
         pass
