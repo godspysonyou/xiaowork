@@ -179,6 +179,18 @@ class XioAll(QtGui.QWidget):
         draw_oee()
 
     def video_recog(self):
+
+        def video_recog_left():
+            img = self.frame_left
+            spark = self.vision.find_spark(img)
+            print(spark)
+
+        def video_recog_right():
+            pass
+        video_recog_left()
+        video_recog_right()
+
+    def video_recog_1(self):
         self.TOTAL += 1
 
         def video_recog_left():
@@ -203,7 +215,7 @@ class XioAll(QtGui.QWidget):
                         has_spark = True
                         break
                 if has_spark:
-                    # print('工作')
+                    print('工作')
                     pass
                 else:
                     print('静止了，往catch文件夹中查看原因')
@@ -215,7 +227,6 @@ class XioAll(QtGui.QWidget):
                     if self.TOTAL % 60 == 0:
                         cv2.imwrite('./catch/' + filename + '.jpg', frame)
 
-            pass
 
         def video_recog_right():
             pass

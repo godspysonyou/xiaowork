@@ -33,7 +33,8 @@ def find_spark_left(img_gam, spark_roi):
     res = cv2.bitwise_and(mask, mask, mask=spark_roi)  # 在该区域检索
     num_res = res/255
     s = np.sum(num_res)
-    if s > 6000:
+    print(s)
+    if s > 1000:
         return True
     return False
 
