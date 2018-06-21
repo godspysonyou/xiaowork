@@ -5,7 +5,7 @@ class DataAccess():
     def __init__(self, host='localhost', user='root', password='123456', db='test', port=3306):
         self.host = host
         self.user = user
-        self.password = '123456'
+        self.password = password
         self.db = db
         self.port = port
         self.conn = None
@@ -44,6 +44,9 @@ class DataAccess():
         # s = functools.partial(self.select, sql='SELECT VERSION()')
         # return s()[0]
         return self.select(sql='SELECT VERSION()')[0][0]
+
+    def insert_action1(self):
+        sql = 'insert into '
 
 
 

@@ -23,18 +23,21 @@ class ThreadedTCPRequestHandler(socketserver.StreamRequestHandler):
     @data_deal
     def handle(self):
         data = str(self.request.recv(1024), 'utf-8')
-        print(data)
-        if data == '1':
+        #print(data)
+        if data == 'action1':
+            print(1)
+        elif data == 'action2':
             pass
-        elif data == '2':
+        elif data == 'action3':
             pass
-        elif data == '3':
+        elif data == 'action4':
             pass
-        elif data == '4':
+        elif data == 'action5':
             pass
-        elif data == '5':
+        elif data == 'action6':
             pass
-        elif data == '0':
+        elif data[0:4] == 'stop':
+
             pass
 
 
@@ -183,7 +186,7 @@ class XioAll(QtGui.QWidget):
         def video_recog_left():
             img = self.frame_left
             spark = self.vision.find_spark(img)
-            print(spark)
+            #print(spark)
 
         def video_recog_right():
             pass
@@ -215,7 +218,7 @@ class XioAll(QtGui.QWidget):
                         has_spark = True
                         break
                 if has_spark:
-                    print('工作')
+                    #print('工作')
                     pass
                 else:
                     print('静止了，往catch文件夹中查看原因')

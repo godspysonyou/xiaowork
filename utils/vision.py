@@ -31,10 +31,10 @@ def find_spark_left(img_gam, spark_roi):
     mask = cv2.inRange(hsv, lower, upper)
     # res_1 = cv2.bitwise_and(hsv,hsv,mask=mask) # hsv颜色选取火花颜色
     res = cv2.bitwise_and(mask, mask, mask=spark_roi)  # 在该区域检索
-    num_res = res/255
+    num_res = res / 255
     s = np.sum(num_res)
-    print(s)
-    if s > 1000:
+    # print(s)
+    if s > 1000:  # 实验得出左边焊接点700是个阈值
         return True
     return False
 
@@ -114,5 +114,3 @@ if __name__ == '__main__':
         _, img = cap.read()
 
         print(v.find_spark(img))
-
-

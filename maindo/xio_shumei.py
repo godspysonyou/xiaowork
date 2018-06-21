@@ -24,15 +24,28 @@ class XioShuMei(QtGui.QWidget):
         self.ui = ui.Ui_Form()
         self.ui.setupUi(self)
         self.type = "end"
+        self.current_event = None
 
     def keyPressEvent(self, QKeyEvent):
         def key_press_operation(action='打孔'):
             info_box = QtGui.QMessageBox()
             reply = info_box.question(self, 'Message', '确定' + action, info_box.Yes | info_box.No, info_box.No)
             if reply == info_box.Yes:
+                self.current_event = action
                 client_connect(self.HOST, self.PORT, action)
             else:
                 print('误触')
+
+        def key_press_stop():
+            info_box = QtGui.QMessageBox()
+            reply = info_box.question(self, 'Message', '确定停止' + self.current_event, info_box.Yes | info_box.No,
+                                      info_box.No)
+            if reply == info_box.Yes:
+                client_connect(self.HOST, self.PORT, 'stop'+self.current_event)
+                self.current_event = None
+            else:
+                print('误触')
+
         if QKeyEvent.key() == QtCore.Qt.Key_1:  # 这里要设计逻辑避免工人误按
             key_press_operation('action1')
 
@@ -50,6 +63,8 @@ class XioShuMei(QtGui.QWidget):
 
         elif QKeyEvent.key() == QtCore.Qt.Key_6:
             key_press_operation('action6')
+        elif QKeyEvent.key() == QtCore.Qt.Key_0:
+            key_press_stop()
 
         else:
             print('no key')
