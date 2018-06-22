@@ -207,10 +207,11 @@ class XioAll(QtGui.QWidget):
             spark = self.vision.find_spark(img)
             self.q.enqueue(spark)
             # print(spark)
-            if True in self.q.queue:
+            if spark or True in self.q.queue:
                 print('work')
                 self.one_static_time = 0
             else:
+
                 print('start or static')
                 self.one_static_time += 1
                 if self.one_static_time % 60 == 0:

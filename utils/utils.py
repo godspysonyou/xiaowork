@@ -91,7 +91,7 @@ def gamma_trans(img, gamma):
     return cv2.LUT(img, gamma_table)
 
 
-def find_spark(img, spark_roi):
+def find_spark(img, spark_roi): # 火花还不够鲁邦，应该再加入颜色瞬间一高一低
     '''
     在固定区域检测火花
     :param img:
@@ -139,6 +139,40 @@ def find_spark_test():
         cv2.waitKey(1)
 
 
+def find_machine_test():
+    cap = cv2.VideoCapture('/Users/kaimingcheng/PycharmProjects/xiaowork/maindo/videos/left_cam.mp4')
+    pre = None
+    curr = None
+    while (1):
+        # Take each frame
+        _, img = cap.read()
+
+        img_gam = gamma_trans(img, 0.75)
+        img0 = cv2.imread('/Users/kaimingcheng/PycharmProjects/xiaowork/maindo/images/mask_3.jpg', 0)
+        ret, thresh1 = cv2.threshold(img0, 127, 255, cv2.THRESH_BINARY)
+        hsv = cv2.cvtColor(img_gam, cv2.COLOR_BGR2HSV)
+
+        lower = np.array([0, 75, 200])
+        upper = np.array([20, 150, 255])
+        mask = cv2.inRange(hsv, lower, upper)
+        res = cv2.bitwise_and(img_gam, img_gam, mask=mask)
+        res_1 = cv2.bitwise_and(res, res, mask=thresh1)
+
+        res_2 = cv2.bitwise_and(mask,mask,mask=thresh1) # 对这个进行帧间差分
+        curr = res_2
+        if (curr is not None) and (pre is not None):
+            print(sum(cv2.absdiff(curr,pre)))
+        pre = curr
+        num_res_1 = res_1 / 255
+        #print(np.sum(num_res_1))
+        cv2.imshow('ga', img_gam)
+        cv2.imshow('mask', mask)
+        cv2.imshow('res', res)
+        cv2.imshow('res1', res_1)
+        cv2.imshow('res2', res_2)
+        cv2.waitKey(1)
+
+
 def test1():
     # show_image('/Users/kaimingcheng/PycharmProjects/xiaowork/maindo/images/447.jpg')
     img = cv2.imread('/Users/kaimingcheng/PycharmProjects/xiaowork/maindo/images/jietu.jpg')
@@ -172,8 +206,9 @@ def test1():
 
 
 if __name__ == '__main__':
-    test1()
-    #find_spark_test()
+    #test1()
+    find_machine_test()
+    # find_spark_test()
     #show_image('./images/1.jpg')
     #roi_cut('./images/1.jpg', (180,420,600,810))
     # time1 = time.time()
