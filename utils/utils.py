@@ -23,7 +23,7 @@ class Timer(QtCore.QThread):
             time.sleep(self.sleep_time)  # 休眠固定时间
 
 class MyQueue():
-    MAX = 20
+    MAX = 30
     def __init__(self):
         self.queue = []
 
@@ -42,7 +42,9 @@ class MyQueue():
         if not self.is_full():
             self.queue.append(frame)
         else:
-            print('溢出')
+            self.dequeue()
+            self.queue.append(frame)
+            #print('溢出')
 
     def dequeue(self):
         if not self.is_empty():
@@ -171,21 +173,15 @@ def test1():
 
 if __name__ == '__main__':
     # test1()
-    find_spark_test()
+    #find_spark_test()
     #show_image('./images/1.jpg')
     #roi_cut('./images/1.jpg', (180,420,600,810))
-    # mq = MyQueue()
-    # mq.enqueue(1)
-    # mq.enqueue(5)
-    # mq.enqueue(1)
-    # mq.enqueue(5)
-    # mq.enqueue(1)
-    # mq.enqueue(5)
-    # mq.enqueue(1)
-    # mq.enqueue(5)
-    # mq.enqueue(1)
-    # mq.enqueue(5)
-    # mq.enqueue(1)
-    # mq.enqueue(5)
-    # mq.dequeue()
-    # print(mq.queue)
+    time1 = time.time()
+    mq = MyQueue()
+    mq.enqueue(1)
+    mq.enqueue(5)
+    mq.enqueue(1)
+    #mq.dequeue()
+    print(mq.queue)
+    time2 = time.time()
+    print(time2-time1)

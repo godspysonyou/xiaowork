@@ -66,6 +66,8 @@ class XioAll(QtGui.QWidget):
     HOST = 'localhost'
     PORT = 8081
     TOTAL = 0
+    isStatic = True
+
 
     def __init__(self):
         super(XioAll, self).__init__()
@@ -75,7 +77,7 @@ class XioAll(QtGui.QWidget):
         self.frame_left = None
         self.frame_right = None
         self.isWork = True
-        self.q = MyQueue()  # 存放帧队列
+        self.q = MyQueue()  # 存放帧队列,改为存放状态比较好
         self.vision = Vision()
 
         self.thread_figure = Timer('updatePlay()', sleep_time=120)  # 该线程用来每隔2分钟刷新绘图区
@@ -201,9 +203,10 @@ class XioAll(QtGui.QWidget):
         def video_recog_left():
             img = self.frame_left
             spark = self.vision.find_spark(img)
-            #print(spark)
+            self.q.enqueue(spark)
+            print(spark)
 
-        def video_recog_right():
+        def video_recog_right(): # 以后用来做换气瓶等的实现
             pass
         video_recog_left()
         video_recog_right()
@@ -246,7 +249,7 @@ class XioAll(QtGui.QWidget):
                         cv2.imwrite('./catch/' + filename + '.jpg', frame)
 
 
-        def video_recog_right():
+        def video_recog_right(): # 以后用来做换气瓶等的实现
             pass
 
         video_recog_left()
