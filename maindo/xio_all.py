@@ -76,7 +76,9 @@ class XioAll(QtGui.QWidget):
 
         self.frame_left = None
         self.frame_right = None
-        self.isWork = True
+        self.is_work = True
+        self.one_static_time = 0 # 一次故障静止的时间
+        self.all_time = 0 # 一天的工作时间
         self.q = MyQueue()  # 存放帧队列,改为存放状态比较好
         self.vision = Vision()
 
@@ -204,7 +206,21 @@ class XioAll(QtGui.QWidget):
             img = self.frame_left
             spark = self.vision.find_spark(img)
             self.q.enqueue(spark)
-            print(spark)
+            # print(spark)
+            if True in self.q.queue:
+                print('work')
+                self.one_static_time = 0
+            else:
+                print('start or static')
+                self.one_static_time += 1
+                if self.one_static_time % 60 == 0:
+                    print('静止了，往catch文件夹中查看原因')
+                    t = time.localtime()
+                    hour = t[3]
+                    mini = t[4]
+                    seco = t[5]
+                    filename = str(hour) + '-' + str(mini) + '-' + str(seco)
+                    cv2.imwrite('./catch/' + filename + '.jpg', img)
 
         def video_recog_right(): # 以后用来做换气瓶等的实现
             pass
