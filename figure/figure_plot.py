@@ -93,9 +93,9 @@ class Figure_OEE(Figure_Origin):
             # axes.set_xlabel(str(month) + "月", fontsize=15)  # 20
             axes.set_ylabel("OEE", fontsize=15)
             # 加坐标轴范围
-            axes.set_xlim(0.0, 14.0)
-            axes.set_xticklabels(("", "7:00", "8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00",
-                                  "16:00", "17:00", "18:00", "19:00"), fontsize=8)
+            axes.set_xlim(0.0, 12.0)
+            axes.set_xticklabels(("", "8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00",
+                                  "16:00", "17:00", "18:00"), fontsize=8)
             axes.set_ylim(0, 100)
             axes.yaxis.set_major_formatter(yticks)
             axes.legend(loc=1)  # 设置legend位置
