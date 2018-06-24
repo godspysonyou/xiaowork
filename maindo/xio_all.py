@@ -144,7 +144,7 @@ class XioAll(QtGui.QWidget):
         def label_show_left(frame, label=self.ui.label):  # 左控件label播放
             height, width, _ = frame.shape
             frame_change = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            frame_resize = cv2.resize(frame_change, (500, 300), interpolation=cv2.INTER_AREA)
+            frame_resize = cv2.resize(frame_change, (360, 240), interpolation=cv2.INTER_AREA)
             image = QtGui.QImage(frame_resize.data, frame_resize.shape[1], frame_resize.shape[0],
                                  QtGui.QImage.Format_RGB888)  # 处理成QImage
             label.setPixmap(QtGui.QPixmap.fromImage(image))
