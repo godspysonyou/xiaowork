@@ -53,6 +53,7 @@ class ThreadedTCPRequestHandler(socketserver.StreamRequestHandler):
             dz = data[4:]
             da = data_access.DataAccess()
             da.insert_action(dz,FLAG='end')
+            # 更新数据库
 
 
 
