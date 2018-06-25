@@ -4,7 +4,7 @@ import datetime
 
 
 class DataAccess():
-    def __init__(self, host='localhost', user='root', password='123456', db='test', port=3306):
+    def __init__(self, host='localhost', user='root', password='hdu417', db='test', port=3306):
         self.host = host
         self.user = user
         self.password = password
@@ -75,7 +75,7 @@ class OEEData(DataAccess):
         super(OEEData, self).__init__()
 
     def select(self):
-        sql = ''
+        sql = 'Select * from oee_date'
         result = self.select_(sql)
         return result
 
@@ -91,7 +91,7 @@ class EquipmentTimeData(DataAccess):
         super(EquipmentTimeData, self).__init__()
 
     def select(self):
-        sql = ''
+        sql = 'Select * from loss'
         result = self.select_(sql)
         return result
 
@@ -106,7 +106,7 @@ class EquipmentData(DataAccess):
         super(EquipmentData, self).__init__()
 
     def select(self):
-        sql = ''
+        sql = 'Select * from loss'
         result = self.select_(sql)
         return result
 
@@ -116,5 +116,6 @@ class EquipmentData(DataAccess):
 
 
 if __name__ == "__main__":
-    da = DataAccess()
-    print(da.select_version())
+    da = EquipmentData()
+    result=da.select()
+    print(result[-1])

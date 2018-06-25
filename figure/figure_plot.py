@@ -81,8 +81,10 @@ class Figure_OEE(Figure_Origin):
             rect.set_facecolor('lightblue')
 
             # 画点
-            X=[1,2,3]
-            Y=[80,70,90]
+            Y=list(args)
+            print(Y)
+            X=[x for x in range(1,len(Y)+1)]
+            print(X)
             type1 = axes.plot(X, Y, label="OEE变化对比", c='g', lw=2, marker='s', mec='r', mfc='r', ms='5')
 
             # 加标题
@@ -108,7 +110,7 @@ class Figure_OEE(Figure_Origin):
 
 
 class Figure_Loss(Figure_Origin):
-    '''这个类是绘制损失占比图
+    '''这个类是绘制损失统计图
     '''
 
     def __init__(self, parent=None, width=3.5, height=2.8, dpi=100):
@@ -116,13 +118,14 @@ class Figure_Loss(Figure_Origin):
 
     def plot(self, *args, **kwargs):
         def plot_loss():
+
             ax = self.figure.add_subplot(111)
             rect = ax.patch
             rect.set_facecolor('lightblue')
 
             x_label = ('拆机', '调试', '静止', '工作')
             x_pos = np.arange(len(x_label))
-            performance = [30,50,80,100]
+            performance = list(args)
             ax.bar(x_pos, performance, width=0.30, align='center', alpha=0.4, color=['red', 'green', 'blue', 'gray'])
             X = np.arange(len(x_label))
             Y = performance
@@ -153,7 +156,7 @@ class Figure_Pie(Figure_Origin):
         def plot_pie():
             ax = self.figure.add_subplot(111)
             ax.set_title("设备工作损失时间占比",fontsize=20)
-            labels = 'e1', 'e2', 'e3', 'e4'
+            labels = '拆机', '调试', '静止', '工作'
             sizes = args
             explode = (0, 0.1, 0, 0)  # 第一个异常在饼图冲凸显，凸显度为0.1
             ax.pie(sizes, explode=explode, labels=labels, autopct='%1.1f%%', shadow=True,

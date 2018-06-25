@@ -165,15 +165,23 @@ class XioAll(QtGui.QWidget):
 
         def draw_fp():  # 绘制损失饼图
             fp = Figure_Pie()
-            fp.plot(*(1, 1, 1, 1))  # '*'有一个解包的功能，将（1，1，1，1）解包为 1 1 1 1
+            da=data_access.EquipmentData()
+            result=da.select()
+            fp.plot(*(result[-1][1], result[-1][2], result[-1][3], result[-1][4]))  # '*'有一个解包的功能，将（1，1，1，1）解包为 1 1 1 1
             graphicscene_fp = QtGui.QGraphicsScene()
             graphicscene_fp.addWidget(fp.canvas)
             self.ui.graphicsView_Pie.setScene(graphicscene_fp)
             self.ui.graphicsView_Pie.show()
 
         def draw_oee():  # 绘制oee日推图
+            L_eff=[]
             oee = Figure_OEE()
-            oee.plot()  # 参数
+            da=data_access.OEEData()
+            result=da.select()
+            for i in range(1,len(result[-1])):
+                if result[-1][i]!=None:
+                     L_eff.append(result[-1][i])
+            oee.plot(*tuple(L_eff))  # 参数
             graphicscene_oee = QtGui.QGraphicsScene()
             graphicscene_oee.addWidget(oee.canvas)
             self.ui.graphicsView_OEE.setScene(graphicscene_oee)
@@ -181,7 +189,9 @@ class XioAll(QtGui.QWidget):
 
         def draw_loss():  # 绘制损失直方图
             loss = Figure_Loss()
-            loss.plot()
+            da=data_access.EquipmentTimeData()
+            result = da.select()
+            loss.plot(*(result[-1][1], result[-1][2], result[-1][3], result[-1][4]))
             graphicscene_loss = QtGui.QGraphicsScene()
             graphicscene_loss.addWidget(loss.canvas)
             self.ui.graphicsView_Loss.setScene(graphicscene_loss)
@@ -194,6 +204,7 @@ class XioAll(QtGui.QWidget):
             graphicscene_mt.addWidget(mt.canvas)
             self.ui.graphicsView_MT.setScene(graphicscene_mt)
             self.ui.graphicsView_MT.show()
+
 
         draw_fp()
         draw_loss()
