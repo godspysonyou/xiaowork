@@ -21,6 +21,7 @@ def data_deal(func):  # 要接受参数就要改成三层装饰器
 
 
 class ThreadedTCPRequestHandler(socketserver.StreamRequestHandler):
+    action = None # 用来通知显示现在是由于什么原因导致静止
     @data_deal
     def handle(self):
         data = str(self.request.recv(1024), 'utf-8')
@@ -29,31 +30,39 @@ class ThreadedTCPRequestHandler(socketserver.StreamRequestHandler):
             dz = data # 动作
             da = data_access.DataAccess()
             da.insert_action(dz)
+            action = data
         elif data == 'action2':
             dz = data  # 动作
             da = data_access.DataAccess()
             da.insert_action(dz)
+            action = data
         elif data == 'action3':
             dz = data  # 动作
             da = data_access.DataAccess()
             da.insert_action(dz)
+            action = data
         elif data == 'action4':
             dz = data  # 动作
             da = data_access.DataAccess()
             da.insert_action(dz)
+            action = data
         elif data == 'action5':
             dz = data  # 动作
             da = data_access.DataAccess()
             da.insert_action(dz)
+            action = data
         elif data == 'action6':
             dz = data  # 动作
             da = data_access.DataAccess()
             da.insert_action(dz)
+            action = data
         elif data[0:4] == 'stop':
             dz = data[4:]
             da = data_access.DataAccess()
             da.insert_action(dz,FLAG='end')
             # 更新数据库
+
+            action = None
 
 
 
@@ -224,16 +233,22 @@ class XioAll(QtGui.QWidget):
                 self.one_static_time = 0
             else:
 
-                print('start or static')
-                self.one_static_time += 1
-                if self.one_static_time % 60 == 0:
-                    print('静止了，往catch文件夹中查看原因')
-                    t = time.localtime()
-                    hour = t[3]
-                    mini = t[4]
-                    seco = t[5]
-                    filename = str(hour) + '-' + str(mini) + '-' + str(seco)
-                    cv2.imwrite('./catch/' + filename + '.jpg', img)
+                # print('start or static')
+                # self.one_static_time += 1
+                # if self.one_static_time % 60 == 0:
+                #     print('静止了，往catch文件夹中查看原因')
+                #     t = time.localtime()
+                #     hour = t[3]
+                #     mini = t[4]
+                #     seco = t[5]
+                #     filename = str(hour) + '-' + str(mini) + '-' + str(seco)
+                #     cv2.imwrite('./catch/' + filename + '.jpg', img)
+                action = ThreadedTCPRequestHandler.action
+                if action != None: # 往面板上写当前由于什么原因导致机器静止
+                    print(action)
+                    message = '[' + time.strftime('%Y-%m-%d %H:%M:%S',
+                                                  time.localtime(time.time())) +']'+action
+                    self.displayMessage(message)
 
         def video_recog_right(): # 以后用来做换气瓶等的实现
             pass
@@ -268,14 +283,18 @@ class XioAll(QtGui.QWidget):
                     #print('工作')
                     pass
                 else:
-                    print('静止了，往catch文件夹中查看原因')
-                    t = time.localtime()
-                    hour = t[3]
-                    mini = t[4]
-                    seco = t[5]
-                    filename = str(hour) + '-' + str(mini) + '-' + str(seco)
-                    if self.TOTAL % 60 == 0:
-                        cv2.imwrite('./catch/' + filename + '.jpg', frame)
+                    # print('静止了，往catch文件夹中查看原因') # 替换成在面板输出
+                    # t = time.localtime()
+                    # hour = t[3]
+                    # mini = t[4]
+                    # seco = t[5]
+                    # filename = str(hour) + '-' + str(mini) + '-' + str(seco)
+                    # if self.TOTAL % 60 == 0:
+                    #     cv2.imwrite('./catch/' + filename + '.jpg', frame)
+
+                    action = ThreadedTCPRequestHandler.action
+                    if action != None:
+                        print(action)
 
 
         def video_recog_right(): # 以后用来做换气瓶等的实现
@@ -286,6 +305,8 @@ class XioAll(QtGui.QWidget):
     def data_read(self):
         pass
 
+    def displayMessage(self, message):
+        self.ui.textBrowser.append(message)
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
