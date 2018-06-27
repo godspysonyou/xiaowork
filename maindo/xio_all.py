@@ -266,7 +266,7 @@ class XioAll(QtGui.QWidget):
                     if self.pre_action is None:
                         print(self.action)
                         message = '[' + time.strftime('%Y-%m-%d %H:%M:%S',
-                                                      time.localtime(time.time())) + ']' + action
+                                                      time.localtime(time.time())) + ']' + self.action
                         self.displayMessage(message)
                     # 如果是视频能识别动作
                     if self.action == 'tiaoshi':
