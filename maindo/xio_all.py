@@ -21,13 +21,14 @@ def data_deal(func):  # 要接受参数就要改成三层装饰器
 
 
 class ThreadedTCPRequestHandler(socketserver.StreamRequestHandler):
-    action = None # 用来通知显示现在是由于什么原因导致静止
+    action = None  # 用来通知显示现在是由于什么原因导致静止
+
     @data_deal
     def handle(self):
         data = str(self.request.recv(1024), 'utf-8')
-        #print(data)
+        # print(data)
         if data == 'action1':
-            dz = data # 动作
+            dz = data  # 动作
             da = data_access.DataAccess()
             da.insert_action(dz)
             action = data
@@ -59,11 +60,10 @@ class ThreadedTCPRequestHandler(socketserver.StreamRequestHandler):
         elif data[0:4] == 'stop':
             dz = data[4:]
             da = data_access.DataAccess()
-            da.insert_action(dz,FLAG='end')
+            da.insert_action(dz, FLAG='end')
             # 更新数据库
 
             action = None
-
 
 
 class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
@@ -77,7 +77,8 @@ class XioAll(QtGui.QWidget):
     PORT = 8081
     TOTAL = 0
     isStatic = True
-
+    action = None
+    pre_action = None
 
     def __init__(self):
         super(XioAll, self).__init__()
@@ -87,8 +88,8 @@ class XioAll(QtGui.QWidget):
         self.frame_left = None
         self.frame_right = None
         self.is_work = True
-        self.one_static_time = 0 # 一次故障静止的时间
-        self.all_time = 0 # 一天的工作时间
+        self.one_static_time = 0  # 一次故障静止的时间
+        self.all_time = 0  # 一天的工作时间
         self.q = MyQueue()  # 存放帧队列,改为存放状态比较好
         self.vision = Vision()
 
@@ -175,8 +176,8 @@ class XioAll(QtGui.QWidget):
 
         def draw_fp():  # 绘制损失饼图
             fp = Figure_Pie()
-            da=data_access.EquipmentData()
-            result=da.select()
+            da = data_access.EquipmentData()
+            result = da.select()
             fp.plot(*(result[-1][1], result[-1][2], result[-1][3], result[-1][4]))  # '*'有一个解包的功能，将（1，1，1，1）解包为 1 1 1 1
             graphicscene_fp = QtGui.QGraphicsScene()
             graphicscene_fp.addWidget(fp.canvas)
@@ -184,13 +185,13 @@ class XioAll(QtGui.QWidget):
             self.ui.graphicsView_Pie.show()
 
         def draw_oee():  # 绘制oee日推图
-            L_eff=[]
+            L_eff = []
             oee = Figure_OEE()
-            da=data_access.OEEData()
-            result=da.select()
-            for i in range(1,len(result[-1])):
-                if result[-1][i]!=None:
-                     L_eff.append(result[-1][i])
+            da = data_access.OEEData()
+            result = da.select()
+            for i in range(1, len(result[-1])):
+                if result[-1][i] != None:
+                    L_eff.append(result[-1][i])
             oee.plot(*tuple(L_eff))  # 参数
             graphicscene_oee = QtGui.QGraphicsScene()
             graphicscene_oee.addWidget(oee.canvas)
@@ -199,7 +200,7 @@ class XioAll(QtGui.QWidget):
 
         def draw_loss():  # 绘制损失直方图
             loss = Figure_Loss()
-            da=data_access.EquipmentTimeData()
+            da = data_access.EquipmentTimeData()
             result = da.select()
             loss.plot(*(result[-1][1], result[-1][2], result[-1][3], result[-1][4]))
             graphicscene_loss = QtGui.QGraphicsScene()
@@ -215,98 +216,123 @@ class XioAll(QtGui.QWidget):
             self.ui.graphicsView_MT.setScene(graphicscene_mt)
             self.ui.graphicsView_MT.show()
 
-
         draw_fp()
         draw_loss()
         draw_mt()
         draw_oee()
 
     def video_recog(self):
+        '''
+        视频识别部分
+        :return:
+        '''
+        frame_left = self.frame_left  # 原始彩色图，左边摄像头
+        frame_left_gray = cv2.cvtColor(frame_left, cv2.COLOR_BGR2GRAY)  # 原始图的灰度图
+
+        # frame_right = self.frame_left  # 原始彩色图
+        # frame_right_gray = cv2.cvtColor(frame_right, cv2.COLOR_BGR2GRAY)
 
         def video_recog_left():
-            img = self.frame_left
+            img = frame_left
             spark = self.vision.find_spark(img)
             self.q.enqueue(spark)
             # print(spark)
-            if spark or True in self.q.queue:
+            if spark or True in self.q.queue:  # 如果一段间隔时间内不断有火花（和机器移动，稍后完成），则说明机器必定处于工作状态
                 print('work')
-                self.one_static_time = 0
+                print('static %d' % self.one_static_time)
+                self.action = None
+                self.one_static_time = 0  # 恢复到运动后，一次静止时间重新清零
             else:
 
-                # print('start or static')
-                # self.one_static_time += 1
-                # if self.one_static_time % 60 == 0:
-                #     print('静止了，往catch文件夹中查看原因')
-                #     t = time.localtime()
-                #     hour = t[3]
-                #     mini = t[4]
-                #     seco = t[5]
-                #     filename = str(hour) + '-' + str(mini) + '-' + str(seco)
-                #     cv2.imwrite('./catch/' + filename + '.jpg', img)
-                action = ThreadedTCPRequestHandler.action
-                if action != None: # 往面板上写当前由于什么原因导致机器静止
-                    print(action)
-                    message = '[' + time.strftime('%Y-%m-%d %H:%M:%S',
-                                                  time.localtime(time.time())) +']'+action
-                    self.displayMessage(message)
+                # ******* 截图
+                print('start or static')
+                self.one_static_time += 1  # 一次静止时间
+                if self.one_static_time % 60 == 0:
+                    print('静止了，往catch文件夹中查看原因')
+                    t = time.localtime()
+                    hour = t[3]
+                    mini = t[4]
+                    seco = t[5]
+                    filename = str(hour) + '-' + str(mini) + '-' + str(seco)
+                    cv2.imwrite('./catch/' + filename + '.jpg', img)
+                # ********
 
-        def video_recog_right(): # 以后用来做换气瓶等的实现
+                if self.vision.tiaoshi(frame_left_gray):  # 如果是视频能识别动作, 比如调试
+                    self.action = 'tiaoshi'
+                else:
+                    self.action = ThreadedTCPRequestHandler.action
+
+                if self.action is not None:  # 往面板上写当前由于什么原因导致机器静止
+                    if self.pre_action is None:
+                        print(self.action)
+                        message = '[' + time.strftime('%Y-%m-%d %H:%M:%S',
+                                                      time.localtime(time.time())) + ']' + action
+                        self.displayMessage(message)
+                    # 如果是视频能识别动作
+                    if self.action == 'tiaoshi':
+                        pass
+                    if self.action == 'qita':
+                        pass
+
+        def video_recog_right():  # 以后用来做换气瓶等的实现
             pass
+
         video_recog_left()
         video_recog_right()
+        self.pre_action = self.action
 
-    def video_recog_1(self):
-        self.TOTAL += 1
-
-        def video_recog_left():
-            '''
-            做摄像头识别
-            :return:
-            '''
-            has_spark = False
-
-            if not self.q.is_full():  # 续满,先这样，可能要写入读图像中
-                if self.frame_left is not None:
-                    self.q.enqueue(self.frame_left)
-
-            else:
-                self.q.dequeue()
-                if self.frame_left is not None:
-                    self.q.enqueue(self.frame_left)
-
-                for frame in self.q.queue:
-                    # frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                    if self.vision.find_spark(frame):
-                        has_spark = True
-                        break
-                if has_spark:
-                    #print('工作')
-                    pass
-                else:
-                    # print('静止了，往catch文件夹中查看原因') # 替换成在面板输出
-                    # t = time.localtime()
-                    # hour = t[3]
-                    # mini = t[4]
-                    # seco = t[5]
-                    # filename = str(hour) + '-' + str(mini) + '-' + str(seco)
-                    # if self.TOTAL % 60 == 0:
-                    #     cv2.imwrite('./catch/' + filename + '.jpg', frame)
-
-                    action = ThreadedTCPRequestHandler.action
-                    if action != None:
-                        print(action)
-
-
-        def video_recog_right(): # 以后用来做换气瓶等的实现
-            pass
-
-        video_recog_left()
+    # def video_recog_1(self):
+    #     self.TOTAL += 1
+    #
+    #     def video_recog_left():
+    #         '''
+    #         做摄像头识别
+    #         :return:
+    #         '''
+    #         has_spark = False
+    #
+    #         if not self.q.is_full():  # 续满,先这样，可能要写入读图像中
+    #             if self.frame_left is not None:
+    #                 self.q.enqueue(self.frame_left)
+    #
+    #         else:
+    #             self.q.dequeue()
+    #             if self.frame_left is not None:
+    #                 self.q.enqueue(self.frame_left)
+    #
+    #             for frame in self.q.queue:
+    #                 # frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    #                 if self.vision.find_spark(frame):
+    #                     has_spark = True
+    #                     break
+    #             if has_spark:
+    #                 # print('工作')
+    #                 pass
+    #             else:
+    #                 # print('静止了，往catch文件夹中查看原因') # 替换成在面板输出
+    #                 # t = time.localtime()
+    #                 # hour = t[3]
+    #                 # mini = t[4]
+    #                 # seco = t[5]
+    #                 # filename = str(hour) + '-' + str(mini) + '-' + str(seco)
+    #                 # if self.TOTAL % 60 == 0:
+    #                 #     cv2.imwrite('./catch/' + filename + '.jpg', frame)
+    #
+    #                 action = ThreadedTCPRequestHandler.action
+    #                 if action != None:
+    #                     print(action)
+    #
+    #     def video_recog_right():  # 以后用来做换气瓶等的实现
+    #         pass
+    #
+    #     video_recog_left()
 
     def data_read(self):
         pass
 
     def displayMessage(self, message):
         self.ui.textBrowser.append(message)
+
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)

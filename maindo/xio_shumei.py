@@ -46,7 +46,7 @@ class XioShuMei(QtGui.QWidget):
             else:
                 print('误触')
 
-        if QKeyEvent.key() == QtCore.Qt.Key_1:  # 这里要设计逻辑避免工人误按
+        if QKeyEvent.key() == QtCore.Qt.Key_1:  # 这里要设计逻辑一项动作开始必须一项动作结束
             key_press_operation('action1')
 
         elif QKeyEvent.key() == QtCore.Qt.Key_2:

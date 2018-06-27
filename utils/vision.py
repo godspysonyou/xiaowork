@@ -75,12 +75,39 @@ class Vision():
         self.mb_loc = (80, 470, 250, 590)  # 机器一般静止位置，后向，这里可以改成切片模式
         self.mf_loc = (180, 420, 600, 810)
 
+        self.people_back = cv2.imread('./images/people_back.jpg', 0)
+        self.people_forward = cv2.imread('./images/people_forward.jpg', 0)
+        self.pb_loc = (130, 260, 610, 690)
+        self.pf_loc = (250, 420, 800, 900)
+
         self.mask_left = cv2.imread('./images/mask_1.jpg', 0)
         self.mask_right = cv2.imread('./images/mask_2.jpg', 0)
 
     def find_spark(self, img):
         img_gam = gamma_trans(img, 0.75)  # 光照归一化
         return find_spark_left(img_gam, self.mask_left) or find_spark_right(img_gam, self.mask_right)
+
+    def judge_people(self, framegray):
+        '''
+        判断工人是否处于调试位置
+        :param framegray: 原始帧的灰度图
+        :return:
+        '''
+        def judge_people_back_similar(roi): # 工人处于后向
+            return classify(self.people_back, roi, 50, 50)
+
+        def judge_people_forward_similar(roi):
+            return classify(self.people_forward, roi, 50, 50)
+
+        pb_roi = framegray[self.pb_loc[0]:self.pb_loc[1], self.pb_loc[2]:self.pb_loc[3]]
+        pf_roi = framegray[self.pf_loc[0]:self.pf_loc[1], self.pf_loc[2]:self.pf_loc[3]]
+        pb_flag = judge_people_back_similar(pb_roi)
+        pf_flag = judge_people_forward_similar(pf_roi)
+        if pb_flag is True:
+            print('机器处于后向')
+        if pf_flag is True:
+            print('机器处于前向')
+        return pb_flag or pf_flag
 
     def judge_machine_static(self, framegray):
         '''
@@ -104,6 +131,16 @@ class Vision():
         if mf_flag is True:
             print('机器处于前向')
         return mb_flag or mf_flag
+
+    def tiaoshi(self, framegray):
+        machine_tiaoshi_static = self.judge_machine_static(framegray)  # 机器调试位置静止
+        people_tiaoshi_static = self.judge_people(framegray)
+
+        if machine_tiaoshi_static and people_tiaoshi_static:
+            return True
+        else:
+            return False
+
 
 
 if __name__ == '__main__':
