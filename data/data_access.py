@@ -4,7 +4,7 @@ import datetime
 
 
 class DataAccess():
-    def __init__(self, host='localhost', user='root', password='hdu417', db='test', port=3306):
+    def __init__(self, host='localhost', user='root', password='123456', db='test', port=3306):
         self.host = host
         self.user = user
         self.password = password
