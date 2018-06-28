@@ -2,6 +2,18 @@ import cv2
 import numpy as np
 
 
+def test_guass():
+    v = Vision()
+    cap = cv2.VideoCapture('./videos/testforward.mp4')
+    while (1):
+        _, img = cap.read()
+        cv2.imshow('', img)
+
+        img_gauss = cv2.GaussianBlur(img,(5,5),0)
+        cv2
+        cv2.imshow('gass', img_gauss)
+        cv2.waitKey(25)
+
 def gamma_trans(img, gamma):
     '''
     将图像光照归一化
@@ -62,7 +74,7 @@ def classify(source_image, compare_image, threshold_1, threshold_2):
     bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)  # 暴力匹配
     matches = bf.match(des1, des2)
     matches = list(filter(lambda x: x.distance < threshold_1, matches))  # 过滤不合格的相似点
-    # print(len(matches))
+    print(len(matches))
     if len(matches) > threshold_2:
         return True
     else:
@@ -106,10 +118,10 @@ class Vision():
         pb_flag = judge_people_back_similar(pb_roi)
         pf_flag = judge_people_forward_similar(pf_roi)
         if pb_flag is True:
-            # print('工人处于后向')
+            print('工人处于后向')
             pass
         if pf_flag is True:
-            # print('工人处于前向')
+            print('工人处于前向')
             pass
         return pb_flag or pf_flag
 
@@ -124,11 +136,11 @@ class Vision():
             return classify(self.machine_back, roi, 50, 80)
 
         def judge_machine_forward_similar(roi):  # 机器处于前向
-            return classify(self.machine_back, roi, 65, 50)
+            return classify(self.machine_back, roi, 90, 140)
 
         mb_roi = framegray[self.mb_loc[0]:self.mb_loc[1], self.mb_loc[2]:self.mb_loc[3]]
         mf_roi = framegray[self.mf_loc[0]:self.mf_loc[1], self.mf_loc[2]:self.mf_loc[3]]
-        # cv2.imshow('1', mf_roi)
+        cv2.imshow('1', mf_roi)
         mb_flag = judge_machine_back_similar(mb_roi)
         mf_flag = judge_machine_forward_similar(mf_roi)
         if mb_flag is True:
@@ -159,12 +171,13 @@ if __name__ == '__main__':
     #
     #     print(v.find_spark(img))
 
-    v = Vision()
-    cap = cv2.VideoCapture('./videos/testback.mp4')
-    while (1):
-        _, img = cap.read()
-        cv2.imshow('',img)
-        cv2.waitKey(25)
-        framegray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
-        if v.tiaoshi(framegray):
-            print('tiaoshi')
+    # v = Vision()
+    # cap = cv2.VideoCapture('./videos/testforward.mp4')
+    # while (1):
+    #     _, img = cap.read()
+    #     cv2.imshow('',img)
+    #     cv2.waitKey(25)
+    #     framegray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+    #     if v.judge_machine_static(framegray):
+    #         pass
+    test_guass()

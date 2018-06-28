@@ -283,6 +283,7 @@ class XioAll(QtGui.QWidget):
             # print(spark)
             if spark or True in self.q.queue:  # 如果一段间隔时间内不断有火花（和机器移动，稍后完成），则说明机器必定处于工作状态
                 print('work')
+                self.action_video = None
                 self.one_static_time = 0  # 恢复到运动后，一次静止时间重新清零
             else:
                 # ******* 截图
@@ -307,7 +308,7 @@ class XioAll(QtGui.QWidget):
                         self.displayMessage(message)
 
                 if self.vision.tiaoshi(frame_left_gray):
-                    self.action_video  = 'tiaoshi'
+                    self.action_video = 'tiaoshi'
                 if self.action_video is not None:
                     if self.pre_action_video is None:
                         print(self.action_video)
