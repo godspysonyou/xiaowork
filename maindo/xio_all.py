@@ -70,24 +70,6 @@ class ThreadedTCPRequestHandler(socketserver.StreamRequestHandler):
             current_time = datetime.datetime.now().strftime('%Y-%m-%d')
             time_diff = time_diff + result_loss[0][int(dz[-1])]  # 此处投机
             lossTime.update_('update loss set ' + dz + '=' + str(time_diff) + ' where SJ="%s"' % current_time)
-            # 更新OEE表
-            # lossTime = data_access.EquipmentTimeData()
-            # result_loss = lossTime.select_("select * from loss ORDER BY SJ DESC limit 1")
-            # zongshijian = time.strftime('%H:%M:%S', time.localtime(time.time()))
-            # huanxing = result_loss[0][1]
-            # dailiao = result_loss[0][2]
-            # shebeiguzhang = result_loss[0][3]
-            # tingzhi = result_loss[0][4]
-            # # qitashijian=result[0][5]
-            # # kongyunzhuan=result[0][6]
-            # fuheshijian = (int(zongshijian.split(':')[0]) - 8) * 3600 + int(zongshijian.split(':')[1]) * 60 + int(
-            #     zongshijian.split(':')[2]) - tingzhi
-            # shijijiagong_1 = fuheshijian - huanxing - dailiao - shebeiguzhang
-            # eff = int(shijijiagong_1 / fuheshijian * 100)  # 计算效率
-            #
-            # hour = time.localtime()[3]  # 实时更新
-            # da_oee = data_access.OEEData()
-            # da_oee.update_("update oee_date set O" + str(hour) + "=" + str(eff) + ' where SJC="' + current_time + '"')
 
             action = None
 
@@ -250,7 +232,7 @@ class XioAll(QtGui.QWidget):
             da = data_access.OEEData()
             result = da.select()
             hour = time.localtime()[3]
-            for i in range(1, hour -6):
+            for i in range(1, hour - 6):
                 L_eff.append(result[-1][i])
             oee.plot(*tuple(L_eff))  # 参数
             graphicscene_oee = QtGui.QGraphicsScene()
