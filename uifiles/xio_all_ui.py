@@ -26,8 +26,13 @@ class Ui_Form(object):
     def setupUi(self, Form):
         Form.setObjectName(_fromUtf8("Form"))
         Form.resize(1440, 856)
+        Form.setStyleSheet(_fromUtf8("color: rgb(255, 255, 255);\n"
+"background-color: rgb(61, 61, 61);\n"
+""))
         self.tabWidget = QtGui.QTabWidget(Form)
         self.tabWidget.setGeometry(QtCore.QRect(10, 109, 1421, 741))
+        self.tabWidget.setStyleSheet(_fromUtf8("color: rgb(49, 49, 49);\n"
+"font: 75 10pt \"Aharoni\";"))
         self.tabWidget.setObjectName(_fromUtf8("tabWidget"))
         self.tab = QtGui.QWidget()
         self.tab.setObjectName(_fromUtf8("tab"))
@@ -72,6 +77,13 @@ class Ui_Form(object):
         self.line_2.setFrameShape(QtGui.QFrame.HLine)
         self.line_2.setFrameShadow(QtGui.QFrame.Sunken)
         self.line_2.setObjectName(_fromUtf8("line_2"))
+        self.label_3 = QtGui.QLabel(Form)
+        self.label_3.setGeometry(QtCore.QRect(320, 30, 521, 41))
+        font = QtGui.QFont()
+        font.setPointSize(25)
+        self.label_3.setFont(font)
+        self.label_3.setStyleSheet(_fromUtf8("color: rgb(255, 255, 255);"))
+        self.label_3.setObjectName(_fromUtf8("label_3"))
 
         self.retranslateUi(Form)
         self.tabWidget.setCurrentIndex(0)
@@ -84,4 +96,5 @@ class Ui_Form(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("Form", "主界面", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("Form", "管理中心", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), _translate("Form", "月数据分析", None))
+        self.label_3.setText(_translate("Form", "卷积神经人工智能管理系统", None))
 
