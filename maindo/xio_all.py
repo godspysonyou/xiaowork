@@ -301,52 +301,6 @@ class XioAll(QtGui.QWidget):
         self.pre_action = self.action
         self.pre_action_video = self.action_video
 
-    # def video_recog_1(self):
-    #     self.TOTAL += 1
-    #
-    #     def video_recog_left():
-    #         '''
-    #         做摄像头识别
-    #         :return:
-    #         '''
-    #         has_spark = False
-    #
-    #         if not self.q.is_full():  # 续满,先这样，可能要写入读图像中
-    #             if self.frame_left is not None:
-    #                 self.q.enqueue(self.frame_left)
-    #
-    #         else:
-    #             self.q.dequeue()
-    #             if self.frame_left is not None:
-    #                 self.q.enqueue(self.frame_left)
-    #
-    #             for frame in self.q.queue:
-    #                 # frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-    #                 if self.vision.find_spark(frame):
-    #                     has_spark = True
-    #                     break
-    #             if has_spark:
-    #                 # print('工作')
-    #                 pass
-    #             else:
-    #                 # print('静止了，往catch文件夹中查看原因') # 替换成在面板输出
-    #                 # t = time.localtime()
-    #                 # hour = t[3]
-    #                 # mini = t[4]
-    #                 # seco = t[5]
-    #                 # filename = str(hour) + '-' + str(mini) + '-' + str(seco)
-    #                 # if self.TOTAL % 60 == 0:
-    #                 #     cv2.imwrite('./catch/' + filename + '.jpg', frame)
-    #
-    #                 action = ThreadedTCPRequestHandler.action
-    #                 if action != None:
-    #                     print(action)
-    #
-    #     def video_recog_right():  # 以后用来做换气瓶等的实现
-    #         pass
-    #
-    #     video_recog_left()
-
     def data_read(self):
         pass
 

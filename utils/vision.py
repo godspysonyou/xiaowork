@@ -102,7 +102,7 @@ class Vision():
 
         pb_roi = framegray[self.pb_loc[0]:self.pb_loc[1], self.pb_loc[2]:self.pb_loc[3]]
         pf_roi = framegray[self.pf_loc[0]:self.pf_loc[1], self.pf_loc[2]:self.pf_loc[3]]
-        # cv2.imshow('1', pf_roi)
+        cv2.imshow('1', pf_roi)
         pb_flag = judge_people_back_similar(pb_roi)
         pf_flag = judge_people_forward_similar(pf_roi)
         if pb_flag is True:
