@@ -112,13 +112,32 @@ class EquipmentData(DataAccess):
         self.update_(sql)
 
 
-# if __name__ == "__main__":
-#     dz="action2"
-#     time_diff=160
-#     lossTime=EquipmentTimeData()
-#     current_time = datetime.datetime.now().strftime('%Y-%m-%d')
-#     lossTime.update_('insert into loss(SJ,action1,action2,action3,action4,action5,action6)values("%s",%d,%d,%d,%d,%d,%d)'%(current_time,0,0,0,0,0,0))
-#     if str(lossTime.select()[-1][0])==current_time:
-#         print("yes")
-#     else:
-#         print("no")
+if __name__ == "__main__":
+    current_time = datetime.datetime.now().strftime('%Y-%m-%d')
+    da_oee = OEEData()  # 对oee实时利用率进行统计
+    result_oee = da_oee.select_('select * from oee_date ORDER BY SJC DESC limit 1')
+    if str(result_oee[0][0]) != current_time:
+        da_oee.update_('insert into oee_date(SJC,O8,O9,O10,O11,O12,O13,O14,O15,O16,O17,O18)values'
+                      '("'+current_time+'",0,0,0,0,0,0,0,0,0,0,0)')
+    else:
+        pass
+
+    # dz="action2"
+    # time_diff=160
+    # lossTime=EquipmentTimeData()
+    # current_time = datetime.datetime.now().strftime('%Y-%m-%d')
+    # #lossTime.update_('insert into loss(SJ,action1,action2,action3,action4,action5,action6)values("%s",%d,%d,%d,%d,%d,%d)'%(current_time,0,0,0,0,0,0))
+    # result=lossTime.select_("select * from loss ORDER BY SJ DESC limit 1")
+    # zongshijian=time.strftime('%H:%M:%S',time.localtime(time.time()))
+    # print(zongshijian)
+    # huanxing=result[0][1]
+    # dailiao=result[0][2]
+    # shebeiguzhang=result[0][3]
+    # tingzhi=result[0][4]
+    # # qitashijian=result[0][5]
+    # # kongyunzhuan=result[0][6]
+    # fuheshijian=(int(zongshijian.split(':')[0])-8)*3600+int(zongshijian.split(':')[1])*60+int(zongshijian.split(':')[2])-tingzhi
+    # shijijiagong_1=fuheshijian-huanxing-dailiao-shebeiguzhang
+    # eff=int(shijijiagong_1/fuheshijian*100)
+    # print(eff)
+

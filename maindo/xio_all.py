@@ -62,18 +62,16 @@ class ThreadedTCPRequestHandler(socketserver.StreamRequestHandler):
             dz = data[4:]
             da = data_access.DataAccess()
             da.insert_action(dz, FLAG='end')
-            # 更新数据库
-            result=da.select_("select * from dz ORDER BY SJC DESC limit 2")
-            time_diff=int((result[0][0]-result[1][0]).seconds)
-            lossTime=data_access.EquipmentTimeData()
-            result_loss=lossTime.select_("select * from loss ORDER BY SJ DESC limit 1")
-            current_time=datetime.datetime.now().strftime('%Y-%m-%d')
-            time_diff=time_diff+result_loss[0][int(dz[-1])] #此处投机
+            # 更新动作表
+            result = da.select_("select * from dz ORDER BY SJC DESC limit 2")
+            time_diff = int((result[0][0] - result[1][0]).seconds)
+            lossTime = data_access.EquipmentTimeData()
+            result_loss = lossTime.select_("select * from loss ORDER BY SJ DESC limit 1")
+            current_time = datetime.datetime.now().strftime('%Y-%m-%d')
+            time_diff = time_diff + result_loss[0][int(dz[-1])]  # 此处投机
             lossTime.update_('update loss set ' + dz + '=' + str(time_diff) + ' where SJ="%s"' % current_time)
 
             action = None
-
-
 
 
 class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
@@ -104,13 +102,21 @@ class XioAll(QtGui.QWidget):
         self.all_time = 0  # 一天的工作时间
         self.q = MyQueue()  # 存放帧队列,改为存放状态比较好
         self.vision = Vision()
-
-        da=data_access.EquipmentTimeData()
-        result_loss=da.select()
-        current_time=datetime.datetime.now().strftime('%Y-%m-%d')
-        if str(result_loss[0][0])!=current_time:
+        # 若日期发生改变，自行插入全零数据
+        da = data_access.EquipmentTimeData()  # 对损失项统计表进行操作
+        result_loss = da.select_("select * from loss ORDER BY SJ DESC limit 1")
+        current_time = datetime.datetime.now().strftime('%Y-%m-%d')
+        if str(result_loss[0][0]) != current_time:
             da.update('insert into loss(SJ,action1,action2,action3,action4,action5,action6)values'
-                      '("%s",%d,%d,%d,%d,%d,%d)'%(current_time,0,0,0,0,0,0))
+                      '("%s",%d,%d,%d,%d,%d,%d)' % (current_time, 0, 0, 0, 0, 0, 0))
+        else:
+            pass
+
+        da_oee = data_access.OEEData()  # 对oee实时利用率进行统计
+        result_oee = da_oee.select_('select * from oee_date ORDER BY SJC DESC limit 1')
+        if str(result_oee[0][0]) != current_time:
+            da_oee.update_('insert into oee_date(SJC,O8,O9,O10,O11,O12,O13,O14,O15,O16,O17,O18)values'
+                           '("' + current_time + '",0,0,0,0,0,0,0,0,0,0,0)')
         else:
             pass
         self.thread_figure = Timer('updatePlay()', sleep_time=120)  # 该线程用来每隔2分钟刷新绘图区
@@ -205,13 +211,31 @@ class XioAll(QtGui.QWidget):
             self.ui.graphicsView_Pie.show()
 
         def draw_oee():  # 绘制oee日推图
+            current_time = datetime.datetime.now().strftime('%Y-%m-%d')
+            lossTime = data_access.EquipmentTimeData()
+            result_loss = lossTime.select_("select * from loss ORDER BY SJ DESC limit 1")
+            zongshijian = time.strftime('%H:%M:%S', time.localtime(time.time()))
+            huanxing = result_loss[0][1]
+            dailiao = result_loss[0][2]
+            shebeiguzhang = result_loss[0][3]
+            tingzhi = result_loss[0][4]
+            # qitashijian=result[0][5]
+            # kongyunzhuan=result[0][6]
+            fuheshijian = (int(zongshijian.split(':')[0]) - 8) * 3600 + int(zongshijian.split(':')[1]) * 60 + int(
+                zongshijian.split(':')[2]) - tingzhi
+            shijijiagong_1 = fuheshijian - huanxing - dailiao - shebeiguzhang
+            eff = int(shijijiagong_1 / fuheshijian * 100)  # 计算效率
+
+            hour = time.localtime()[3]  # 实时更新
+            da_oee = data_access.OEEData()
+            da_oee.update_("update oee_date set O" + str(hour) + "=" + str(eff) + ' where SJC="' + current_time + '"')
             L_eff = []
             oee = Figure_OEE()
             da = data_access.OEEData()
             result = da.select()
-            for i in range(1, len(result[-1])):
-                if result[-1][i] != None:
-                    L_eff.append(result[-1][i])
+            hour = time.localtime()[3]
+            for i in range(1, hour - 6):
+                L_eff.append(result[-1][i])
             oee.plot(*tuple(L_eff))  # 参数
             graphicscene_oee = QtGui.QGraphicsScene()
             graphicscene_oee.addWidget(oee.canvas)
