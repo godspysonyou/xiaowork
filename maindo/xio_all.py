@@ -87,6 +87,8 @@ class XioAll(QtGui.QWidget):
     isStatic = True
     action = None
     pre_action = None
+    action_video = None # 视频内能识别
+    pre_action_video = None
 
     def __init__(self):
         super(XioAll, self).__init__()
@@ -281,15 +283,12 @@ class XioAll(QtGui.QWidget):
             # print(spark)
             if spark or True in self.q.queue:  # 如果一段间隔时间内不断有火花（和机器移动，稍后完成），则说明机器必定处于工作状态
                 print('work')
-                print('static %d' % self.one_static_time)
-                self.action = None
                 self.one_static_time = 0  # 恢复到运动后，一次静止时间重新清零
             else:
-
                 # ******* 截图
-                print('start or static')
                 self.one_static_time += 1  # 一次静止时间
                 if self.one_static_time % 60 == 0:
+                    print('start or static')
                     print('静止了，往catch文件夹中查看原因')
                     t = time.localtime()
                     hour = t[3]
@@ -299,22 +298,24 @@ class XioAll(QtGui.QWidget):
                     cv2.imwrite('./catch/' + filename + '.jpg', img)
                 # ********
 
-                if self.vision.tiaoshi(frame_left_gray):  # 如果是视频能识别动作, 比如调试
-                    self.action = 'tiaoshi'
-                else:
-                    self.action = ThreadedTCPRequestHandler.action
-
+                self.action = ThreadedTCPRequestHandler.action # 键盘操作
                 if self.action is not None:  # 往面板上写当前由于什么原因导致机器静止
                     if self.pre_action is None:
                         print(self.action)
                         message = '[' + time.strftime('%Y-%m-%d %H:%M:%S',
-                                                      time.localtime(time.time())) + ']' + self.action
+                                                      time.localtime(time.time())) + ']' + str(self.action)
                         self.displayMessage(message)
-                    # 如果是视频能识别动作
-                    if self.action == 'tiaoshi':
-                        pass
-                    if self.action == 'qita':
-                        pass
+
+                if self.vision.tiaoshi(frame_left_gray):
+                    self.action_video  = 'tiaoshi'
+                if self.action_video is not None:
+                    if self.pre_action_video is None:
+                        print(self.action_video)
+                        message = '[' + time.strftime('%Y-%m-%d %H:%M:%S',
+                                                      time.localtime(time.time())) + ']' + str(self.action_video)
+                        self.displayMessage(message)
+
+
 
         def video_recog_right():  # 以后用来做换气瓶等的实现
             pass
@@ -322,6 +323,7 @@ class XioAll(QtGui.QWidget):
         video_recog_left()
         video_recog_right()
         self.pre_action = self.action
+        self.pre_action_video = self.action_video
 
     # def video_recog_1(self):
     #     self.TOTAL += 1
