@@ -62,6 +62,7 @@ def classify(source_image, compare_image, threshold_1, threshold_2):
     bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)  # 暴力匹配
     matches = bf.match(des1, des2)
     matches = list(filter(lambda x: x.distance < threshold_1, matches))  # 过滤不合格的相似点
+    # print(len(matches))
     if len(matches) > threshold_2:
         return True
     else:
@@ -72,7 +73,7 @@ class Vision():
     def __init__(self):
         self.machine_back = cv2.imread('./images/machine_back.jpg', 0)  # 机器一般静止图，后向
         self.machine_forward = cv2.imread('./images/machine_forward.jpg', 0)
-        self.mb_loc = (80, 470, 250, 590)  # 机器一般静止位置，后向，这里可以改成切片模式
+        self.mb_loc = (80, 250, 470, 590)  # 机器一般静止位置，后向，这里可以改成切片模式
         self.mf_loc = (180, 420, 600, 810)
 
         self.people_back = cv2.imread('./images/people_back.jpg', 0)
@@ -94,19 +95,22 @@ class Vision():
         :return:
         '''
         def judge_people_back_similar(roi): # 工人处于后向
-            return classify(self.people_back, roi, 50, 50)
+            return classify(self.people_back, roi, 80, 15)
 
         def judge_people_forward_similar(roi):
-            return classify(self.people_forward, roi, 50, 50)
+            return classify(self.people_forward, roi, 70, 25)
 
         pb_roi = framegray[self.pb_loc[0]:self.pb_loc[1], self.pb_loc[2]:self.pb_loc[3]]
         pf_roi = framegray[self.pf_loc[0]:self.pf_loc[1], self.pf_loc[2]:self.pf_loc[3]]
+        # cv2.imshow('1', pf_roi)
         pb_flag = judge_people_back_similar(pb_roi)
         pf_flag = judge_people_forward_similar(pf_roi)
         if pb_flag is True:
-            print('机器处于后向')
+            # print('工人处于后向')
+            pass
         if pf_flag is True:
-            print('机器处于前向')
+            # print('工人处于前向')
+            pass
         return pb_flag or pf_flag
 
     def judge_machine_static(self, framegray):
@@ -117,19 +121,22 @@ class Vision():
         '''
 
         def judge_machine_back_similar(roi):  # 机器处于后向
-            return classify(self.machine_back, roi, 50, 50)
+            return classify(self.machine_back, roi, 50, 80)
 
         def judge_machine_forward_similar(roi):  # 机器处于前向
-            return classify(self.machine_back, roi, 50, 50)
+            return classify(self.machine_back, roi, 65, 50)
 
         mb_roi = framegray[self.mb_loc[0]:self.mb_loc[1], self.mb_loc[2]:self.mb_loc[3]]
         mf_roi = framegray[self.mf_loc[0]:self.mf_loc[1], self.mf_loc[2]:self.mf_loc[3]]
+        # cv2.imshow('1', mf_roi)
         mb_flag = judge_machine_back_similar(mb_roi)
         mf_flag = judge_machine_forward_similar(mf_roi)
         if mb_flag is True:
-            print('机器处于后向')
+            # print('机器处于后向')
+            pass
         if mf_flag is True:
-            print('机器处于前向')
+            # print('机器处于前向')
+            pass
         return mb_flag or mf_flag
 
     def tiaoshi(self, framegray):
@@ -144,10 +151,20 @@ class Vision():
 
 
 if __name__ == '__main__':
-    v = Vision()
-    cap = cv2.VideoCapture('/Users/kaimingcheng/PycharmProjects/xiaowork/maindo/videos/left_cam.mp4')
-    while (1):
-        # Take each frame
-        _, img = cap.read()
+    # v = Vision()
+    # cap = cv2.VideoCapture('/Users/kaimingcheng/PycharmProjects/xiaowork/maindo/videos/left_cam.mp4')
+    # while (1):
+    #     # Take each frame
+    #     _, img = cap.read()
+    #
+    #     print(v.find_spark(img))
 
-        print(v.find_spark(img))
+    v = Vision()
+    cap = cv2.VideoCapture('./videos/testback.mp4')
+    while (1):
+        _, img = cap.read()
+        cv2.imshow('',img)
+        cv2.waitKey(25)
+        framegray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+        if v.tiaoshi(framegray):
+            print('tiaoshi')

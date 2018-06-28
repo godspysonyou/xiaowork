@@ -140,7 +140,8 @@ def find_spark_test():
 
 
 def find_machine_test():
-    cap = cv2.VideoCapture('/Users/kaimingcheng/PycharmProjects/xiaowork/maindo/videos/left_cam.mp4')
+    # cap = cv2.VideoCapture('/Users/kaimingcheng/PycharmProjects/xiaowork/maindo/videos/left_cam.mp4')
+    cap = cv2.VideoCapture('./videos/testback.mp4')
     pre = None
     curr = None
     while (1):
@@ -211,7 +212,7 @@ def test1():
 if __name__ == '__main__':
     # test1()
     #find_machine_test()
-    find_spark_test()
+    # find_spark_test()
     # show_image('./images/1.jpg')
     # roi_cut('./images/1.jpg', (180,420,600,810))
     # time1 = time.time()
@@ -223,3 +224,4 @@ if __name__ == '__main__':
     # print(mq.queue)
     # time2 = time.time()
     # print(time2-time1)
+    find_machine_test()

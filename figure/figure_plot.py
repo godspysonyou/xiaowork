@@ -82,9 +82,9 @@ class Figure_OEE(Figure_Origin):
 
             # 画点
             Y=list(args)
-            print(Y)
+            #print(Y)
             X=[x for x in range(1,len(Y)+1)]
-            print(X)
+            #print(X)
             type1 = axes.plot(X, Y, label="OEE变化对比", c='g', lw=2, marker='s', mec='r', mfc='r', ms='5')
 
             # 加标题
