@@ -4,6 +4,7 @@ import sys
 import cv2
 import threading
 import time
+import datetime
 from utils.utils import Timer, MyQueue
 from utils.vision import Vision
 import socketserver
@@ -62,8 +63,17 @@ class ThreadedTCPRequestHandler(socketserver.StreamRequestHandler):
             da = data_access.DataAccess()
             da.insert_action(dz, FLAG='end')
             # 更新数据库
+            result=da.select_("select * from dz ORDER BY SJC DESC limit 2")
+            time_diff=int((result[0][0]-result[1][0]).seconds)
+            lossTime=data_access.EquipmentTimeData()
+            result_loss=lossTime.select_("select * from loss ORDER BY SJ DESC limit 1")
+            current_time=datetime.datetime.now().strftime('%Y-%m-%d')
+            time_diff=time_diff+result_loss[0][int(dz[-1])] #此处投机
+            lossTime.update_('update loss set ' + dz + '=' + str(time_diff) + ' where SJ="%s"' % current_time)
 
             action = None
+
+
 
 
 class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
@@ -93,6 +103,14 @@ class XioAll(QtGui.QWidget):
         self.q = MyQueue()  # 存放帧队列,改为存放状态比较好
         self.vision = Vision()
 
+        da=data_access.EquipmentTimeData()
+        result_loss=da.select()
+        current_time=datetime.datetime.now().strftime('%Y-%m-%d')
+        if str(result_loss[0][0])!=current_time:
+            da.update('insert into loss(SJ,action1,action2,action3,action4,action5,action6)values'
+                      '("%s",%d,%d,%d,%d,%d,%d)'%(current_time,0,0,0,0,0,0))
+        else:
+            pass
         self.thread_figure = Timer('updatePlay()', sleep_time=120)  # 该线程用来每隔2分钟刷新绘图区
         self.connect(self.thread_figure, QtCore.SIGNAL('updatePlay()'), self.draw)
         self.thread_figure.start()

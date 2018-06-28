@@ -80,7 +80,6 @@ class OEEData(DataAccess):
         return result
 
     def update(self, sql):
-        sql = ''
         self.update_(sql)
 
 
@@ -96,7 +95,6 @@ class EquipmentTimeData(DataAccess):
         return result
 
     def update(self, sql):
-        sql = ''
         self.update_(sql)
 
 
@@ -111,11 +109,16 @@ class EquipmentData(DataAccess):
         return result
 
     def update(self, sql):
-        sql = ''
         self.update_(sql)
 
 
-if __name__ == "__main__":
-    da = EquipmentData()
-    result=da.select()
-    print(result[-1])
+# if __name__ == "__main__":
+#     dz="action2"
+#     time_diff=160
+#     lossTime=EquipmentTimeData()
+#     current_time = datetime.datetime.now().strftime('%Y-%m-%d')
+#     lossTime.update_('insert into loss(SJ,action1,action2,action3,action4,action5,action6)values("%s",%d,%d,%d,%d,%d,%d)'%(current_time,0,0,0,0,0,0))
+#     if str(lossTime.select()[-1][0])==current_time:
+#         print("yes")
+#     else:
+#         print("no")
