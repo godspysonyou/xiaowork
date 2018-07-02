@@ -3,6 +3,7 @@ import time
 import matplotlib.pyplot as plt
 import cv2
 import numpy as np
+import datetime
 
 
 class Timer(QtCore.QThread):
@@ -208,6 +209,9 @@ def test1():
     cv2.imshow('res', res)
     cv2.waitKey(0)
 
+def diff_time(endtime=datetime.datetime.strptime("08:30:00", "%H:%M:%S"), starttime=datetime.datetime.strptime("07:30:00", "%H:%M:%S")):
+    print((endtime - starttime).seconds)
+    pass
 
 if __name__ == '__main__':
     # test1()
@@ -224,4 +228,6 @@ if __name__ == '__main__':
     # print(mq.queue)
     # time2 = time.time()
     # print(time2-time1)
-    find_machine_test()
+    #find_machine_test()
+    print(datetime.datetime.now())
+    diff_time(datetime.datetime.now())
