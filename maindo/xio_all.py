@@ -225,6 +225,7 @@ class XioAll(QtGui.QWidget):
                 zongshijian.split(':')[2]) - tingzhi
             shijijiagong_1 = fuheshijian - huanxing - dailiao - shebeiguzhang
             eff = int(shijijiagong_1 / fuheshijian * 100)  # 计算效率
+            print(eff)
 
             hour = time.localtime()[3]  # 实时更新
             da_oee = data_access.OEEData()
@@ -234,8 +235,9 @@ class XioAll(QtGui.QWidget):
             da = data_access.OEEData()
             result = da.select()
             hour = time.localtime()[3]
-            for i in range(1, hour - 6):
-                L_eff.append(result[-1][i])
+            if hour < 20:
+                for i in range(1, hour - 6):
+                    L_eff.append(result[-1][i])
             oee.plot(*tuple(L_eff))  # 参数
             graphicscene_oee = QtGui.QGraphicsScene()
             graphicscene_oee.addWidget(oee.canvas)
@@ -282,7 +284,7 @@ class XioAll(QtGui.QWidget):
             self.q.enqueue(spark)
             # print(spark)
             if spark or True in self.q.queue:  # 如果一段间隔时间内不断有火花（和机器移动，稍后完成），则说明机器必定处于工作状态
-                print('work')
+                #print('work')
                 self.action_video = None
                 self.one_static_time = 0  # 恢复到运动后，一次静止时间重新清零
             else:
