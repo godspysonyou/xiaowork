@@ -3,14 +3,17 @@ import numpy as np
 
 
 def test_guass():
+    '''
+    测试高斯模糊，降低图像噪声
+    :return:
+    '''
     v = Vision()
     cap = cv2.VideoCapture('./videos/testforward.mp4')
     while (1):
         _, img = cap.read()
         cv2.imshow('', img)
 
-        img_gauss = cv2.GaussianBlur(img,(5,5),0)
-        cv2
+        img_gauss = cv2.GaussianBlur(img,(5,5),0) # 高斯模糊操作，核选择（5*5）
         cv2.imshow('gass', img_gauss)
         cv2.waitKey(25)
 
@@ -32,12 +35,12 @@ def find_spark_left(img_gam, spark_roi):
     '''
     在固定区域检测火花
     :param img:
-    :param spark_roi: 这个参数为一个不规则mask，二值图
+    :param spark_roi: 这个参数为一个不规则mask，二值图，是我们要监测的区域
     :return:
     '''
     hsv = cv2.cvtColor(img_gam, cv2.COLOR_BGR2HSV)
 
-    # 火花颜色
+    # 火花颜色，在lower到upper范围寻找
     lower = np.array([0, 0, 250])
     upper = np.array([360, 10, 255])
     mask = cv2.inRange(hsv, lower, upper)
@@ -52,6 +55,12 @@ def find_spark_left(img_gam, spark_roi):
 
 
 def find_spark_right(img_gam, spark_roi):
+    '''
+    同find_spark_left
+    :param img_gam:
+    :param spark_roi:
+    :return:
+    '''
     return find_spark_left(img_gam, spark_roi)
 
 
@@ -65,7 +74,7 @@ def classify(source_image, compare_image, threshold_1, threshold_2):
     :return:
     '''
     orb = cv2.ORB_create()
-    kp1, des1 = orb.detectAndCompute(source_image, None)
+    kp1, des1 = orb.detectAndCompute(source_image, None) # 用orb提取，kp是关键点，des是描述符
     kp2, des2 = orb.detectAndCompute(compare_image, None)
 
     if des2 is None:  # 待比较的图比较单一，没有特征，显然与基图不相似
@@ -97,6 +106,11 @@ class Vision():
         self.mask_right = cv2.imread('./images/mask_2.jpg', 0)
 
     def find_spark(self, img):
+        '''
+        查找火花
+        :param img:
+        :return:
+        '''
         img_gam = gamma_trans(img, 0.75)  # 光照归一化
         return find_spark_left(img_gam, self.mask_left) or find_spark_right(img_gam, self.mask_right)
 
@@ -109,7 +123,7 @@ class Vision():
         def judge_people_back_similar(roi): # 工人处于后向
             return classify(self.people_back, roi, 80, 15)
 
-        def judge_people_forward_similar(roi):
+        def judge_people_forward_similar(roi): # 工人处于前向
             return classify(self.people_forward, roi, 70, 25)
 
         pb_roi = framegray[self.pb_loc[0]:self.pb_loc[1], self.pb_loc[2]:self.pb_loc[3]]
@@ -152,6 +166,11 @@ class Vision():
         return mb_flag or mf_flag
 
     def tiaoshi(self, framegray):
+        '''
+        判断机器是否处于调试状态
+        :param framegray: 输入是一张灰度图
+        :return:
+        '''
         machine_tiaoshi_static = self.judge_machine_static(framegray)  # 机器调试位置静止
         people_tiaoshi_static = self.judge_people(framegray)
 
@@ -159,6 +178,8 @@ class Vision():
             return True
         else:
             return False
+
+
 
 
 
