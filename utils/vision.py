@@ -3,13 +3,17 @@ import numpy as np
 
 
 def test_guass():
+    '''
+    高斯模糊测试，将图片降噪
+    :return:
+    '''
     v = Vision()
     cap = cv2.VideoCapture('./videos/testforward.mp4')
     while (1):
         _, img = cap.read()
         cv2.imshow('', img)
 
-        img_gauss = cv2.GaussianBlur(img,(5,5),0)
+        img_gauss = cv2.GaussianBlur(img,(5,5),0) # 高斯降噪，核采用（5*5）
         cv2.imshow('gass', img_gauss)
         cv2.waitKey(25)
 
@@ -17,7 +21,7 @@ def gamma_trans(img, gamma):
     '''
     将图像光照归一化
     :param img:
-    :param gamma:
+    :param gamma: 0～1
     :return:
     '''
     # 具体做法先归一化到1，然后gamma作为指数值求出新的像素值再还原
@@ -36,7 +40,7 @@ def find_spark_left(img_gam, spark_roi):
     '''
     hsv = cv2.cvtColor(img_gam, cv2.COLOR_BGR2HSV)
 
-    # 火花颜色
+    # 火花颜色，范围从lower到upper
     lower = np.array([0, 0, 250])
     upper = np.array([360, 10, 255])
     mask = cv2.inRange(hsv, lower, upper)
@@ -51,6 +55,12 @@ def find_spark_left(img_gam, spark_roi):
 
 
 def find_spark_right(img_gam, spark_roi):
+    '''
+    同find_spark_left
+    :param img_gam:
+    :param spark_roi:
+    :return:
+    '''
     return find_spark_left(img_gam, spark_roi)
 
 
@@ -151,6 +161,11 @@ class Vision():
         return mb_flag or mf_flag
 
     def tiaoshi(self, framegray):
+        '''
+        测试是否处于调试状态
+        :param framegray:
+        :return:
+        '''
         machine_tiaoshi_static = self.judge_machine_static(framegray)  # 机器调试位置静止
         people_tiaoshi_static = self.judge_people(framegray)
 
